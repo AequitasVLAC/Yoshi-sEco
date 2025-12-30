@@ -6,6 +6,8 @@
 
 > **💬 Twitch Chat Compliant:** All messages respect Twitch's 500 character limit and deliver compact, engaging adventure scenarios.
 
+> **⚡ Quick Import Available:** Skip manual setup! Use the [one-click import string](../DnD_Adventure_Import.md) to instantly add this game to Streamer.bot.
+
 This guide teaches you how to add an interactive DnD-style "Choose Your Own Adventure" game to your Streamer.bot economy system. Players spend eggs for daily adventures with saving throws, randomized outcomes, and rewards.
 
 ---

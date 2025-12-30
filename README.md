@@ -2,6 +2,10 @@
 
 Welcome to the Yoshi's Island Eggonomy repository! This repository contains comprehensive documentation for building an interactive and engaging egg-based economy system using Streamer.bot.
 
+## 🎮 Quick Import Available!
+
+**NEW:** You can now instantly import the DnD Adventure game into Streamer.bot! See **[DnD_Adventure_Import.md](DnD_Adventure_Import.md)** for the one-click import string.
+
 ## What's Inside
 
 This repository provides a complete, production-ready guide for implementing an egg-based economy system that includes:

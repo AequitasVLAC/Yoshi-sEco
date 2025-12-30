@@ -2,6 +2,10 @@
 
 Welcome to the Yoshi's Island Eggonomy repository! This repository contains comprehensive documentation for building an interactive and engaging egg-based economy system using Streamer.bot.
 
+## 🎮 Quick Import Available!
+
+**NEW:** You can now instantly import the DnD Adventure game into Streamer.bot! See **[DnD_Adventure_Import.md](DnD_Adventure_Import.md)** for the one-click import string.
+
 ## What's Inside
 
 This repository provides a complete, production-ready guide for implementing an egg-based economy system that includes:
@@ -76,6 +80,16 @@ Extend the system with custom features.
 - Custom rank tiers
 - Integration with Channel Points, Bits, and Subs
 
+#### **[DnD Adventure Guide](docs/DnD_Adventure_Guide.md)** 🎲
+Daily D&D-style adventure game with saving throws.
+- Seven saving throw types (STR, DEX, CON, INT, WIS, CHA, Death)
+- D20 roll mechanics with tiered outcomes
+- Randomized scenarios for replayability
+- 24-hour cooldown system
+- Egg and token rewards
+- Complete implementation guide
+- Customization and balance options
+
 #### **[Troubleshooting Guide](docs/Troubleshooting_Guide.md)** 🔧
 Solutions to common issues and best practices.
 - 50+ common issues with solutions
@@ -147,6 +161,7 @@ Everything plus events and custom features:
 - **Chomp Tunnel** - Risk/reward with streak multipliers and golden eggs
 - **Hatch Roll** - D20 luck-based game with tiered rewards
 - **Duel Nest** - PvP battles with auto-resolution after 10 minutes
+- **DnD Adventure** - Daily D&D-style adventures with saving throws and randomized scenarios
 
 ### 🎉 Events (Optional)
 - **Double Rewards** - 2x payouts for limited time
@@ -179,6 +194,7 @@ Everything plus events and custom features:
 | `!eggroll` | Play Hatch Roll | 1 Dice Egg |
 | `!duelnest @user <wager>` | Challenge to PvP | 1 Duel Egg + wager |
 | `!accept` | Accept a duel challenge | 1 Duel Egg + wager |
+| `!adventure` | Daily DnD-style adventure | 500 Pouch Eggs |
 | `!top` | View leaderboard | Free |
 | `!titles` | View rank progression | Free |
 | `!eggpack` | View full inventory (Pouch Eggs + all tokens) | Free |
@@ -218,13 +234,14 @@ This economy runs 100% inside Streamer.bot with no external dependencies:
 3. **Variable_Reference.md** - All 175+ variables documented (22KB)
 4. **Event_System_Guide.md** - Events and bonuses (35KB)
 5. **Advanced_Features_Guide.md** - Custom tokens and games (36KB)
-6. **Troubleshooting_Guide.md** - Solutions and best practices (23KB)
+6. **DnD_Adventure_Guide.md** - D&D-style daily adventure game (29KB)
+7. **Troubleshooting_Guide.md** - Solutions and best practices (23KB)
 
 ### Total Content
-- **150+ pages** of documentation
-- **30+ code examples** ready to copy/paste
-- **10+ complete game implementations**
-- **175+ variables** fully explained
+- **180+ pages** of documentation
+- **35+ code examples** ready to copy/paste
+- **15+ complete game implementations**
+- **180+ variables** fully explained
 - **50+ common issues** with solutions
 - **20+ customization templates**
 
@@ -262,7 +279,8 @@ Created for the Streamer.bot community. Special thanks to all streamers who test
 ## Recent Updates
 
 **December 2025 - Major Expansion Release:**
-- ✅ Added comprehensive Variable Reference (175+ variables documented)
+- ✅ Added DnD Adventure Guide (daily D&D-style adventure game)
+- ✅ Added comprehensive Variable Reference (180+ variables documented)
 - ✅ Added Event System Guide (6 event types with full implementation)
 - ✅ Added Advanced Features Guide (custom tokens, games, achievements)
 - ✅ Added Troubleshooting Guide (50+ issues with solutions)
@@ -274,6 +292,7 @@ Created for the Streamer.bot community. Special thanks to all streamers who test
 - ✅ Included integration guides for Channel Points, Bits, Subs
 
 **What's New:**
+- **DnD Adventure Game** - Daily RPG-style adventures with saving throws
 - **Event System** - Double Rewards, Free Entry, Custom Multipliers
 - **Complete Variable Documentation** - Every variable explained with examples
 - **Advanced Customization** - Templates for tokens, games, and features

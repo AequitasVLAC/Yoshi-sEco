@@ -257,6 +257,24 @@ CPH.AddPoints(userId, payout, "Your Game Win");
 
 ---
 
+### Featured Game: DnD-Style Adventure
+
+**⭐ NEW: Complete Implementation Available**
+
+For a comprehensive daily adventure game with D&D-style saving throws, see the **[DnD Adventure Guide](DnD_Adventure_Guide.md)**.
+
+**Features:**
+- Daily adventures with 24-hour cooldown
+- Seven saving throw types (STR, DEX, CON, INT, WIS, CHA, Death)
+- D20 roll system with tiered outcomes
+- Randomized scenarios for replayability
+- Egg and token rewards
+- Compact Twitch-friendly messages
+
+**Perfect for:** Streams wanting a daily engagement ritual with RPG elements.
+
+---
+
 ### Example Game 1: Egg Hunt
 
 **Concept:** Roll to find hidden eggs in different locations. Higher rolls find better hiding spots.

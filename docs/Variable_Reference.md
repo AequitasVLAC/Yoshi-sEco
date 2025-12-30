@@ -422,6 +422,67 @@ if (goldenEgg) {
 
 ---
 
+### {userId}_adventureLastPlayed
+- **Type:** `long` (Unix Timestamp)
+- **Initial Value:** `0`
+- **Persisted:** ✅ Yes
+- **Purpose:** Timestamp of when user last played DnD Adventure
+- **Modified By:** `[GAME] DnD Adventure`
+- **Used In:** 24-hour cooldown enforcement
+- **Cooldown:** 86400 seconds (24 hours)
+
+```csharp
+// Get last played timestamp
+long lastPlayed = CPH.GetGlobalVar<long>($"{userId}_adventureLastPlayed", true);
+long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+// Check if cooldown has expired (24 hours)
+bool canPlay = (currentTime - lastPlayed) >= 86400;
+
+// Update timestamp after playing
+CPH.SetGlobalVar($"{userId}_adventureLastPlayed", currentTime, true);
+```
+
+---
+
+### {userId}_totalAdventures
+- **Type:** `int` (Integer)
+- **Initial Value:** `0`
+- **Persisted:** ✅ Yes
+- **Purpose:** Total number of DnD Adventures completed
+- **Modified By:** `[GAME] DnD Adventure`
+- **Used In:** `!adventurestats` command, progression tracking
+
+```csharp
+int totalAdventures = CPH.GetGlobalVar<int>($"{userId}_totalAdventures", true);
+CPH.SetGlobalVar($"{userId}_totalAdventures", totalAdventures + 1, true);
+```
+
+---
+
+### {userId}_adventureStreak (Optional)
+- **Type:** `int` (Integer)
+- **Initial Value:** `0`
+- **Persisted:** ✅ Yes
+- **Purpose:** Consecutive successful adventures (optional feature)
+- **Modified By:** `[GAME] DnD Adventure`
+- **Reset On:** Failed adventure (negative egg outcome)
+- **Used In:** Streak bonus rewards
+
+```csharp
+// Increase streak on success
+if (eggReward > 0) {
+    int streak = CPH.GetGlobalVar<int>($"{userId}_adventureStreak", true);
+    streak++;
+    CPH.SetGlobalVar($"{userId}_adventureStreak", streak, true);
+} else {
+    // Reset on failure
+    CPH.SetGlobalVar($"{userId}_adventureStreak", 0, true);
+}
+```
+
+---
+
 ## Temporary Game State Variables
 
 These variables manage active game states and expire automatically.

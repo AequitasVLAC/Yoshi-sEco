@@ -217,6 +217,46 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 
 ---
 
+### DnD Adventure Guide
+**File:** `DnD_Adventure_Guide.md` (29 KB)  
+**Time Required:** 30-45 minutes  
+**Difficulty:** ⭐⭐ Intermediate
+
+**What You'll Build:**
+- Daily DnD-style adventure game
+- Seven saving throw types (STR, DEX, CON, INT, WIS, CHA, Death)
+- D20 roll system with tiered outcomes
+- Randomized scenario generation
+- 24-hour cooldown system
+- Egg and token reward system
+- Adventure statistics tracking
+
+**Use This If:**
+- You want daily engagement mechanics
+- Your community enjoys RPG elements
+- You want storytelling in your economy
+- You need once-per-day content
+
+**Contains:**
+- Complete implementation guide
+- Full C# code for adventure system
+- 35+ unique scenarios
+- Reward balance formulas
+- Event system integration
+- Customization options
+- Testing procedures
+
+**Key Features:**
+1. D20 saving throw mechanics
+2. Critical success/failure outcomes
+3. Randomized scenario selection
+4. Daily cooldown enforcement
+5. Token reward distribution
+6. Adventure streak tracking
+7. Difficulty customization options
+
+---
+
 ### Troubleshooting Guide
 **File:** `Troubleshooting_Guide.md` (23 KB)  
 **Time Required:** Reference (as needed)  
@@ -352,27 +392,28 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 
 ## 📊 Feature Comparison Matrix
 
-| Feature | Quick Start | Unified | Events | Advanced |
-|---------|------------|---------|--------|----------|
-| **Currency System** | ✅ | ✅ | ✅ | ✅ |
-| **Token Purchases** | ✅ (3 types) | ✅ (3 types) | ✅ (3 types) | ✅ (Unlimited) |
-| **Chomp Tunnel** | ✅ | ✅ | ✅ | ✅ |
-| **Hatch Roll** | ❌ | ✅ | ✅ | ✅ |
-| **Duel Nest PvP** | ❌ | ✅ | ✅ | ✅ |
-| **User Commands** | Basic | Complete | Complete | Complete |
-| **Economy Monitoring** | ✅ | ✅ | ✅ | ✅ |
-| **Rank System** | ✅ (7 tiers) | ✅ (7 tiers) | ✅ (7 tiers) | ✅ (9+ tiers) |
-| **Double Rewards** | ❌ | ❌ | ✅ | ✅ |
-| **Free Entry** | ❌ | ❌ | ✅ | ✅ |
-| **Custom Multipliers** | ❌ | ❌ | ✅ | ✅ |
-| **Jackpot Events** | ❌ | ❌ | ✅ | ✅ |
-| **Scheduled Events** | ❌ | ❌ | ✅ | ✅ |
-| **Custom Tokens** | ❌ | ❌ | ❌ | ✅ |
-| **Custom Games** | ❌ | ❌ | ❌ | ✅ |
-| **Achievements** | ❌ | ❌ | ❌ | ✅ |
-| **Teams** | ❌ | ❌ | ❌ | ✅ |
-| **Season Pass** | ❌ | ❌ | ❌ | ✅ |
-| **Integrations** | ❌ | ❌ | ❌ | ✅ |
+| Feature | Quick Start | Unified | Events | Advanced | DnD Adventure |
+|---------|------------|---------|--------|----------|---------------|
+| **Currency System** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Token Purchases** | ✅ (3 types) | ✅ (3 types) | ✅ (3 types) | ✅ (Unlimited) | ✅ (3 types) |
+| **Chomp Tunnel** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Hatch Roll** | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **Duel Nest PvP** | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **DnD Adventure** | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **User Commands** | Basic | Complete | Complete | Complete | Complete |
+| **Economy Monitoring** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Rank System** | ✅ (7 tiers) | ✅ (7 tiers) | ✅ (7 tiers) | ✅ (9+ tiers) | ✅ (7 tiers) |
+| **Double Rewards** | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Free Entry** | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Custom Multipliers** | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Jackpot Events** | ❌ | ❌ | ✅ | ✅ | ❌ |
+| **Scheduled Events** | ❌ | ❌ | ✅ | ✅ | ❌ |
+| **Custom Tokens** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Custom Games** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Achievements** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Teams** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Season Pass** | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Integrations** | ❌ | ❌ | ❌ | ✅ | ❌ |
 
 ---
 
@@ -396,6 +437,7 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 - Chomp Tunnel → Quick Start or Unified Guide, Stage 3.1
 - Hatch Roll → Unified Guide, Stage 3.2
 - Duel Nest → Unified Guide, Stage 3.3
+- DnD Adventure → DnD Adventure Guide
 - Custom games → Advanced Features Guide, Creating New Games
 
 **Events:**
@@ -509,26 +551,28 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 ## 📈 Documentation Statistics
 
 ### Total Content
-- **6 documentation files**
-- **150+ pages** of content
-- **30+ complete code examples**
-- **10+ game implementations**
-- **175+ variables documented**
+- **7 documentation files**
+- **180+ pages** of content
+- **35+ complete code examples**
+- **15+ game implementations**
+- **180+ variables documented**
 - **50+ troubleshooting solutions**
 - **20+ customization templates**
 
 ### File Sizes
 - Quick Start: 14.5 KB
 - Unified Guide: 80+ KB
-- Variable Reference: 22 KB
+- Variable Reference: 22+ KB
 - Event System: 35 KB
 - Advanced Features: 36 KB
+- DnD Adventure: 29 KB
 - Troubleshooting: 23 KB
-- **Total: 210+ KB of documentation**
+- **Total: 240+ KB of documentation**
 
 ### Time Estimates
 - Quick Start: 30-45 minutes
 - Unified Implementation: 1-2 hours
+- DnD Adventure: 30-45 minutes
 - With Events: 2-3 hours
 - With Advanced Features: 3-4 hours
 - Custom Development: Variable
@@ -565,11 +609,20 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 - **[Variables](Variable_Reference.md)** - All variables documented
 - **[Events](Event_System_Guide.md)** - Event system implementation
 - **[Advanced](Advanced_Features_Guide.md)** - Custom features
+- **[DnD Adventure](DnD_Adventure_Guide.md)** - D&D-style daily adventure
 - **[Troubleshooting](Troubleshooting_Guide.md)** - Solutions and tips
 
 ---
 
 ## 📝 Version History
+
+**Version 2.1 - DnD Adventure Update (December 2025)**
+- Added DnD Adventure Guide (daily RPG-style adventure game)
+- Added D20 saving throw system (7 types: STR, DEX, CON, INT, WIS, CHA, Death)
+- Added 35+ randomized adventure scenarios
+- Added adventure-specific variables to Variable Reference
+- Updated all documentation indexes and cross-references
+- Total content increased to 180+ pages
 
 **Version 2.0 - Enhanced Edition (December 2025)**
 - Added 5 new documentation files

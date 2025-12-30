@@ -1525,7 +1525,7 @@ Complete these tests in Streamer.bot **before going live:**
 | `!accept` | Accept a duel challenge | 1 Duel Egg + wager |
 | `!top` | View leaderboard of top egg holders | Free |
 | `!titles` | View rank progression and your current rank | Free |
-| `!eggpack` | View your inventory | Free |
+| `!eggpack` | View full inventory (Pouch Eggs + all tokens) | Free |
 | `!sheet` | View your character stats | Free |
 | `!reroll` | Reset your character | 1,000 Pouch Eggs |
 | `!econfunds` | Check economy fund balances (Mod only) | Free |

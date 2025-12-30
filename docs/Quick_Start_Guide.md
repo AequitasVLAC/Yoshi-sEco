@@ -446,7 +446,7 @@ Run these tests in order:
 
 3. **Inventory Test**
    ```
-   !eggpack  → Shows 2 Mystery Eggs
+   !eggpack  → Shows Pouch Eggs + 2 Mystery Eggs + other tokens
    ```
 
 4. **Game Test**
@@ -527,7 +527,7 @@ Now that core system works, you can:
 | `!eggs` | Check balance | Everyone |
 | `!buy <token> <qty>` | Buy tokens | Everyone |
 | `!chomp` | Play Chomp Tunnel | Everyone (needs Mystery Egg) |
-| `!eggpack` | View inventory | Everyone |
+| `!eggpack` | View full inventory (Pouch Eggs + tokens) | Everyone |
 | `!titles` | View rank | Everyone |
 | `!econfunds` | Check economy funds | Moderators only |
 
@@ -540,7 +540,7 @@ You have a working economy if:
 - ✅ Users earn eggs passively while watching
 - ✅ Users can buy tokens with `!buy`
 - ✅ Users can play games with tokens
-- ✅ Users can check inventory with `!eggpack`
+- ✅ Users can check full inventory (Pouch Eggs + tokens) with `!eggpack`
 - ✅ Users can view ranks with `!titles`
 - ✅ You can monitor economy with `!econfunds`
 

@@ -551,26 +551,28 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 ## 📈 Documentation Statistics
 
 ### Total Content
-- **6 documentation files**
-- **150+ pages** of content
-- **30+ complete code examples**
-- **10+ game implementations**
-- **175+ variables documented**
+- **7 documentation files**
+- **180+ pages** of content
+- **35+ complete code examples**
+- **15+ game implementations**
+- **180+ variables documented**
 - **50+ troubleshooting solutions**
 - **20+ customization templates**
 
 ### File Sizes
 - Quick Start: 14.5 KB
 - Unified Guide: 80+ KB
-- Variable Reference: 22 KB
+- Variable Reference: 22+ KB
 - Event System: 35 KB
 - Advanced Features: 36 KB
+- DnD Adventure: 29 KB
 - Troubleshooting: 23 KB
-- **Total: 210+ KB of documentation**
+- **Total: 240+ KB of documentation**
 
 ### Time Estimates
 - Quick Start: 30-45 minutes
 - Unified Implementation: 1-2 hours
+- DnD Adventure: 30-45 minutes
 - With Events: 2-3 hours
 - With Advanced Features: 3-4 hours
 - Custom Development: Variable
@@ -607,11 +609,20 @@ This index helps you navigate the complete documentation for the Yoshi's Island 
 - **[Variables](Variable_Reference.md)** - All variables documented
 - **[Events](Event_System_Guide.md)** - Event system implementation
 - **[Advanced](Advanced_Features_Guide.md)** - Custom features
+- **[DnD Adventure](DnD_Adventure_Guide.md)** - D&D-style daily adventure
 - **[Troubleshooting](Troubleshooting_Guide.md)** - Solutions and tips
 
 ---
 
 ## 📝 Version History
+
+**Version 2.1 - DnD Adventure Update (December 2025)**
+- Added DnD Adventure Guide (daily RPG-style adventure game)
+- Added D20 saving throw system (7 types: STR, DEX, CON, INT, WIS, CHA, Death)
+- Added 35+ randomized adventure scenarios
+- Added adventure-specific variables to Variable Reference
+- Updated all documentation indexes and cross-references
+- Total content increased to 180+ pages
 
 **Version 2.0 - Enhanced Edition (December 2025)**
 - Added 5 new documentation files

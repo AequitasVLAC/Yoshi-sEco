@@ -76,6 +76,16 @@ Extend the system with custom features.
 - Custom rank tiers
 - Integration with Channel Points, Bits, and Subs
 
+#### **[DnD Adventure Guide](docs/DnD_Adventure_Guide.md)** 🎲
+Daily D&D-style adventure game with saving throws.
+- Seven saving throw types (STR, DEX, CON, INT, WIS, CHA, Death)
+- D20 roll mechanics with tiered outcomes
+- Randomized scenarios for replayability
+- 24-hour cooldown system
+- Egg and token rewards
+- Complete implementation guide
+- Customization and balance options
+
 #### **[Troubleshooting Guide](docs/Troubleshooting_Guide.md)** 🔧
 Solutions to common issues and best practices.
 - 50+ common issues with solutions
@@ -265,7 +275,8 @@ Created for the Streamer.bot community. Special thanks to all streamers who test
 ## Recent Updates
 
 **December 2025 - Major Expansion Release:**
-- ✅ Added comprehensive Variable Reference (175+ variables documented)
+- ✅ Added DnD Adventure Guide (daily D&D-style adventure game)
+- ✅ Added comprehensive Variable Reference (180+ variables documented)
 - ✅ Added Event System Guide (6 event types with full implementation)
 - ✅ Added Advanced Features Guide (custom tokens, games, achievements)
 - ✅ Added Troubleshooting Guide (50+ issues with solutions)
@@ -277,6 +288,7 @@ Created for the Streamer.bot community. Special thanks to all streamers who test
 - ✅ Included integration guides for Channel Points, Bits, Subs
 
 **What's New:**
+- **DnD Adventure Game** - Daily RPG-style adventures with saving throws
 - **Event System** - Double Rewards, Free Entry, Custom Multipliers
 - **Complete Variable Documentation** - Every variable explained with examples
 - **Advanced Customization** - Templates for tokens, games, and features

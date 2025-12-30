@@ -30,6 +30,8 @@ This repository provides a complete guide for implementing an egg-based economy 
 - ✅ **Three Game Types:** Risk-based, luck-based, and PvP gameplay
 - ✅ **Token Economy:** Separate tokens for different activities
 - ✅ **Auto-Resolving PvP:** Duels resolve automatically after 10 minutes
+- ✅ **Leaderboard System:** Track top egg holders with !top command
+- ✅ **Progression Ranks:** Seven tiers from Hatchling to Egg Emperor
 - ✅ **Currency Sinks:** Multiple mechanisms to maintain economic balance
 - ✅ **User Stats:** Track streaks, wins, and performance
 
@@ -42,6 +44,9 @@ This repository provides a complete guide for implementing an egg-based economy 
 | `!chomp` | Play Chomp Tunnel |
 | `!eggroll` | Play Hatch Roll |
 | `!duelnest` | Challenge to PvP |
+| `!accept` | Accept a duel challenge |
+| `!top` | View leaderboard |
+| `!titles` | View rank and progression |
 | `!eggpack` | View inventory |
 | `!sheet` | View stats |
 | `!reroll` | Reset character |

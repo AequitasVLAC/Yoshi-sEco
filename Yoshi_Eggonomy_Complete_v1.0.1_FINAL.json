@@ -5,7 +5,7 @@
   "description": "Complete egg-based economy with tokens, games, PvP battles, and progression system. Includes: Buy tokens, Chomp Tunnel, Hatch Roll, Duel Nest PvP with auto-resolver, rank system, inventory management, and economy monitoring. Includes DnD daily adventures and complete leaderboard system.",
   "version": "1.0.1",
   "platform": "streamerbot",
-  "platformVersion": "0.2.0+",
+  "platformVersion": "1.0.1",
   "createdAt": "2025-12-30T23:45:05.394008",
   "actions": [
     {

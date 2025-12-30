@@ -341,7 +341,7 @@ Let's go! 🎉
 ## 📝 Version Info
 
 - **Export Version:** 1.0.1
-- **Compatible With:** Streamer.bot v0.2.0 and later
+- **Compatible With:** Streamer.bot v1.0.1 (also works with v0.2.0+)
 - **Platform:** Windows (Streamer.bot requirement)
 - **Last Updated:** December 2025
 

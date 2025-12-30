@@ -122,7 +122,7 @@ See the `docs/` folder for:
 
 ## ⚙️ System Requirements
 
-- **Streamer.bot:** v0.2.0 or later (tested with v1.0.1)
+- **Streamer.bot:** v1.0.1 (also compatible with v0.2.0+)
 - **Operating System:** Windows
 - **Twitch Account:** Connected to Streamer.bot
 - **Loyalty System:** Must be enabled in Streamer.bot

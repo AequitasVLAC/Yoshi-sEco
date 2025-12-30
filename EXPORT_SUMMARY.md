@@ -143,7 +143,7 @@ All documented code has been debugged and validated. The export is production-re
 
 ## 🔧 Compatibility
 
-- **Streamer.bot:** v0.2.0 or later (tested with v1.0.1)
+- **Streamer.bot:** v1.0.1 (also compatible with v0.2.0+)
 - **Platform:** Windows (Streamer.bot requirement)
 - **Twitch:** Integrated with Twitch chat and loyalty system
 - **No External Dependencies:** 100% native Streamer.bot
@@ -225,5 +225,5 @@ For questions about the export system:
 
 **Version:** 1.0.1  
 **Created:** December 2025  
-**Format:** Streamer.bot v0.2.0+ compatible  
+**Format:** Streamer.bot v1.0.1 compatible (also works with v0.2.0+)  
 **Status:** Complete and Production-Ready ✅

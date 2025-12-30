@@ -147,6 +147,7 @@ Everything plus events and custom features:
 - **Chomp Tunnel** - Risk/reward with streak multipliers and golden eggs
 - **Hatch Roll** - D20 luck-based game with tiered rewards
 - **Duel Nest** - PvP battles with auto-resolution after 10 minutes
+- **DnD Adventure** - Daily D&D-style adventures with saving throws and randomized scenarios
 
 ### 🎉 Events (Optional)
 - **Double Rewards** - 2x payouts for limited time
@@ -179,6 +180,7 @@ Everything plus events and custom features:
 | `!eggroll` | Play Hatch Roll | 1 Dice Egg |
 | `!duelnest @user <wager>` | Challenge to PvP | 1 Duel Egg + wager |
 | `!accept` | Accept a duel challenge | 1 Duel Egg + wager |
+| `!adventure` | Daily DnD-style adventure | 500 Pouch Eggs |
 | `!top` | View leaderboard | Free |
 | `!titles` | View rank progression | Free |
 | `!eggpack` | View full inventory (Pouch Eggs + all tokens) | Free |
@@ -218,13 +220,14 @@ This economy runs 100% inside Streamer.bot with no external dependencies:
 3. **Variable_Reference.md** - All 175+ variables documented (22KB)
 4. **Event_System_Guide.md** - Events and bonuses (35KB)
 5. **Advanced_Features_Guide.md** - Custom tokens and games (36KB)
-6. **Troubleshooting_Guide.md** - Solutions and best practices (23KB)
+6. **DnD_Adventure_Guide.md** - D&D-style daily adventure game (29KB)
+7. **Troubleshooting_Guide.md** - Solutions and best practices (23KB)
 
 ### Total Content
-- **150+ pages** of documentation
-- **30+ code examples** ready to copy/paste
-- **10+ complete game implementations**
-- **175+ variables** fully explained
+- **180+ pages** of documentation
+- **35+ code examples** ready to copy/paste
+- **15+ complete game implementations**
+- **180+ variables** fully explained
 - **50+ common issues** with solutions
 - **20+ customization templates**
 

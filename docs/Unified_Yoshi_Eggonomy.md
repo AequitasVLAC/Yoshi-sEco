@@ -4,15 +4,46 @@
 **Setup Location:** All actions, commands, and configurations are created within Streamer.bot  
 **No External Scripts Required:** Everything runs natively in Streamer.bot using C# Execute Code actions
 
+> **📌 Streamer.bot Version Note:** This guide is written for Streamer.bot v0.2.0+. Menu locations and naming may vary slightly between versions (e.g., "Settings → Variables" vs "Variables" tab). The core functionality and C# code remain the same across versions.
+
 This document provides a comprehensive, step-by-step setup for creating an interactive egg-based economy using Streamer.bot. It integrates the token system, PvP mechanics, and games into a single, functional system where users can earn, spend, and lose eggs effectively. The design includes cohesive interactions, balanced game mechanics, and sinks to maintain a sustainable economy.
 
 ## Prerequisites
 
 Before starting, ensure you have:
 - **Streamer.bot v0.2.0 or later** installed and connected to your Twitch account
-- **Loyalty Points system enabled** in Streamer.bot
+- **Loyalty Points system enabled** in Streamer.bot (Settings → Loyalty)
 - **Basic understanding of** creating Actions and Commands in Streamer.bot
 - **C# code execution enabled** (default in Streamer.bot)
+- **Twitch channel is live** or in test mode for testing commands
+
+### How This System Works in Streamer.bot
+
+**Architecture Overview:**
+- **Loyalty Points (Pouch Eggs):** Managed by Streamer.bot's built-in loyalty system
+- **Token Inventory:** Stored as Global Variables (format: `{userId}_TokenType`)
+- **Game Logic:** C# Execute Code actions run within Streamer.bot process
+- **Commands:** Trigger actions when users type in Twitch chat
+- **Timers:** Timed Actions run periodically to check for duels to resolve
+- **No Database:** Everything stored in Streamer.bot's variable system (SQLite backend)
+
+**Data Flow Example (Buying a Token):**
+1. User types `!buy MysteryEgg 1` in chat
+2. Twitch sends message to Streamer.bot
+3. Streamer.bot triggers `!buy` command
+4. Command runs `[ECON] Buy Token` action
+5. C# code executes within Streamer.bot
+6. Code checks loyalty points, deducts 20 eggs
+7. Code stores token in global variable `{userId}_MysteryEgg`
+8. Code updates economy funds
+9. Streamer.bot sends confirmation message to Twitch chat
+
+**Why This Works Well:**
+- ✅ No external services or databases needed
+- ✅ All data persists through restarts (global variables saved)
+- ✅ Real-time response to commands
+- ✅ Built-in integration with Twitch
+- ✅ Easy to modify and extend
 
 ## Implementation Time Estimate
 - **Quick Setup (Core Features):** 30-45 minutes
@@ -72,22 +103,24 @@ Follow these steps in order for a working implementation:
 
 **Step-by-Step Instructions:**
 
-1. In Streamer.bot, go to: `Settings` → `Variables` → `Global Variables`
-2. Click **Add Variable** and create these two variables:
+1. In Streamer.bot, go to: `Settings` → `Variables`
+   - *Note: In some Streamer.bot versions, there may be a dedicated `Variables` tab at the top*
+2. Look for **Global Variables** section
+3. Click **Add** or **+** button to create new variables
 
    **Variable 1:**
    - **Name:** `bigNestFund`
-   - **Type:** Number
-   - **Initial Value:** `1000`
-   - **Persisted:** ✅ Yes
+   - **Value/Type:** Number with value `1000`
+   - **Persisted:** ✅ Yes (check "Persist" if available)
    
    **Variable 2:**
    - **Name:** `eggCartonJackpot`
-   - **Type:** Number
-   - **Initial Value:** `500`
-   - **Persisted:** ✅ Yes
+   - **Value/Type:** Number with value `500`
+   - **Persisted:** ✅ Yes (check "Persist" if available)
 
-3. Click **Save**
+4. Click **Save** or **OK**
+
+**Verify:** After creating, you should see both variables listed with their values.
 
 **Note:** These funds collect token purchase fees and can be used for special events or giveaways.
 
@@ -741,15 +774,20 @@ public class CPHInline
    - Click **Compile** → **Save and Compile**
 
 **4. Create Timed Action (CRITICAL):**
-   - Go to: `Actions` tab
-   - Look for **Timed Actions** section (usually at bottom)
-   - Click **Add Timed Action**
+   - In Streamer.bot, go to: `Actions` tab
+   - Right-click on the `[PVP] Duel Resolver` action you just created
+   - Select **Add Timed Action** or look for timer icon/option
+   - *Alternative: Some versions have a separate "Timed Actions" or "Timers" section/tab*
+   
+   **Timer Configuration:**
    - **Name:** `Duel Resolver Timer`
    - **Enabled:** ✅ Yes
-   - **Interval:** **60 seconds** (checks every minute)
-   - **Action:** Select `[PVP] Duel Resolver`
-   - **Repeat:** ✅ Yes (infinite loop)
-   - Click **OK**
+   - **Interval:** `60` seconds or `1` minute (checks every minute)
+   - **Action:** `[PVP] Duel Resolver` (should be auto-selected)
+   - **Repeat:** ✅ Yes (must repeat indefinitely)
+   - Click **OK** or **Save**
+
+**Verify:** Check that the timer shows as "Enabled" and is running. You should see it in the Actions list with a clock/timer icon.
 
 **5. Test:** Challenge someone, accept, wait 10 minutes (or temporarily change code to 1 minute for testing)
 
@@ -1021,80 +1059,178 @@ public class CPHInline
 
 ---
 
-### 4.5 Reset Character
-**Command:** `!reroll`
+## Stage 5: Economy Balance and Monitoring (5 minutes)
 
-Allows the user to reset their character stats for a fee of 1,000 Pouch Eggs.
+### 5.1 Understanding Currency Sinks
 
-#### Implementation Steps:
-1. **Create the Action:** `[USER] Reset Character`
-2. **Add Reset Logic:**
-    ```csharp
-    string userId = args["userId"].ToString();
-    string userName = args["userName"].ToString();
-    
-    int resetCost = 1000;
-    int userBalance = CPH.GetPoints(userId);
-    
-    // Check if user has enough eggs
-    if (userBalance < resetCost)
-    {
-        CPH.SendMessage($"@{userName}, character reroll costs {resetCost} Pouch Eggs. You only have {userBalance}.");
-        return false;
-    }
-    
-    // Deduct cost
-    CPH.RemovePoints(userId, resetCost);
-    
-    // Reset all stats and tokens
-    CPH.SetGlobalVar($"{userId}_chompStreak", 0, true);
-    CPH.SetGlobalVar($"{userId}_chompWins", 0, true);
-    CPH.SetGlobalVar($"{userId}_eggrollPlays", 0, true);
-    CPH.SetGlobalVar($"{userId}_duelWins", 0, true);
-    CPH.SetGlobalVar($"{userId}_duelLosses", 0, true);
-    CPH.SetGlobalVar($"{userId}_MysteryEgg", 0, true);
-    CPH.SetGlobalVar($"{userId}_DiceEgg", 0, true);
-    CPH.SetGlobalVar($"{userId}_DuelEgg", 0, true);
-    
-    CPH.SendMessage($"@{userName} has rerolled their character for {resetCost} Pouch Eggs! All stats and tokens reset. 🔄");
-    
-    return true;
-    ```
+Your economy includes built-in sinks to prevent inflation:
+- **Token Purchases:** 10% of every purchase is removed from circulation
+- **Duel Nest:** 15% of total pot goes to `bigNestFund` (not directly back to players)
+- **Character Reroll:** 1,000 eggs removed permanently
 
-3. **Configure Command Trigger:**
-    - **Command:** `!reroll`
-    - **Permissions:** Everyone
-    - **Cooldown:** 60 seconds per user
+### 5.2 Global Economy Funds
 
----
+Two funds track and manage the economy (already created in Stage 1):
+- **`bigNestFund`**: Collects 70% of token purchases - use for special events, giveaways
+- **`eggCartonJackpot`**: Collects 20% of token purchases - use for lottery/milestone rewards
 
-## Stage 5: Economy Balance and Maintenance
+### 5.3 Economy Monitoring Command (Moderator Only) - `!econfunds`
 
-### 5.1 Currency Sinks
-The economy includes several sinks to prevent inflation:
-- **Token Purchases:** 10% of every purchase is removed from circulation.
-- **Duel Nest:** 15% of the total pot goes to `bigNestFund`.
-- **Character Reroll:** 1,000 eggs are removed from circulation.
+**Step-by-Step Setup:**
 
-### 5.2 Global Funds
-Two global funds are maintained:
-- **`bigNestFund`**: Can be used for special events, giveaways, or jackpots.
-- **`eggCartonJackpot`**: Can be used for periodic lottery drawings or milestone rewards.
+**1. Create the Action:**
+   - Go to: `Actions` tab → Click **Add**
+   - **Action Name:** `[MOD] Check Economy Funds`
+   - Click **OK**
 
-### 5.3 Monitoring Commands (Moderator Only)
-Create moderator-only commands to check the health of the economy:
+**2. Add Execute Code Sub-Action:**
+   - Click **Add Sub-Action** → `Core` → `C#` → `Execute Code`
+   - **DELETE ALL** default code and paste:
 
-**Command:** `!econfunds`
 ```csharp
-int bigNestFund = CPH.GetGlobalVar<int>("bigNestFund", true);
-int eggCartonJackpot = CPH.GetGlobalVar<int>("eggCartonJackpot", true);
+using System;
 
-CPH.SendMessage($"Economy Funds 💰: Big Nest Fund: {bigNestFund} | Egg Carton Jackpot: {eggCartonJackpot}");
+public class CPHInline
+{
+    public bool Execute()
+    {
+        int bigNestFund = CPH.GetGlobalVar<int>("bigNestFund", true);
+        int eggCartonJackpot = CPH.GetGlobalVar<int>("eggCartonJackpot", true);
+        
+        CPH.SendMessage($"💰 Economy Funds | Big Nest: {bigNestFund} 🥚 | Jackpot: {eggCartonJackpot} 🥚");
+        
+        return true;
+    }
+}
 ```
 
+   - Click **Compile** → **Save and Compile**
+
+**3. Create Command Trigger:**
+   - Go to: `Commands` tab → Click **Add**
+   - **Command:** `!econfunds`
+   - **Enabled:** ✅ Yes
+   - **Action:** Select `[MOD] Check Economy Funds`
+   - **Permissions:** Moderators only
+   - **User Cooldown:** 30 seconds
+   - Click **OK**
+
 ---
 
-## Stage 6: Quick Reference
+## Stage 6: Testing & Go-Live (15 minutes)
+
+### 6.1 Pre-Launch Testing Checklist
+
+Complete these tests in Streamer.bot **before going live:**
+
+**Basic Currency Tests:**
+- [ ] Test `!eggs` - Should show your current balance
+- [ ] Wait 10 minutes while "online" - Should earn passive eggs
+- [ ] Send a chat message and wait 10 min - Should earn active chatter bonus
+
+**Token Purchase Tests:**
+- [ ] Test `!buy MysteryEgg 1` - Should cost 20 eggs
+- [ ] Test `!buy DiceEgg 2` - Should cost 20 eggs (10 each)
+- [ ] Test `!buy DuelEgg 1` - Should cost 5 eggs
+- [ ] Test `!eggpack` - Should show your tokens
+
+**Game Tests:**
+- [ ] Test `!chomp` - Should roll 1-6 and show result
+- [ ] Test `!chomp` multiple times - Verify streak increases on wins
+- [ ] Test `!eggroll` - Should roll 1-20 and award eggs
+- [ ] Test `!duelnest @YourTestAccount 10` - Should create challenge
+- [ ] Test `!accept` (from test account) - Should start duel
+- [ ] Wait 10 minutes - Duel should auto-resolve
+
+**User Command Tests:**
+- [ ] Test `!titles` - Should show your rank
+- [ ] Test `!sheet` - Should show stats
+- [ ] Test `!reroll` (with 1000+ eggs) - Should reset everything
+
+**Moderator Test:**
+- [ ] Test `!econfunds` - Should show fund balances
+
+### 6.2 Common Issues & Solutions
+
+**Streamer.bot-Specific Issues:**
+
+**Issue:** "Command not found"
+- **Solution:** In Streamer.bot Commands tab, verify command is **Enabled** (checkbox)
+- **Solution:** Check command spelling matches exactly (including !)
+- **Solution:** Verify Streamer.bot is connected to Twitch (check connection status)
+
+**Issue:** "Cannot find action" or Action dropdown is empty
+- **Solution:** Verify action name matches exactly in Command → Action dropdown
+- **Solution:** Check that action exists in Actions tab and is not disabled
+- **Solution:** Refresh Streamer.bot or restart if actions don't appear
+
+**Issue:** "Compile error" in C# code
+- **Solution:** Ensure you deleted ALL default template code before pasting
+- **Solution:** Check `using System;` is at the top of every code block
+- **Solution:** Verify all `{` and `}` braces are balanced (use code editor with bracket matching)
+- **Solution:** Check for smart quotes (" ") vs straight quotes (" ") - must use straight quotes
+- **Solution:** Ensure class name is exactly `CPHInline` (case-sensitive)
+
+**Issue:** Duel never resolves
+- **Solution:** Verify Timed Action for `[PVP] Duel Resolver` is created and **Enabled**
+- **Solution:** Check timer interval is exactly 60 seconds
+- **Solution:** Ensure "Repeat" option is checked (infinite loop)
+- **Solution:** In Streamer.bot, check Actions tab to see if timer shows as running
+- **Solution:** Check Streamer.bot logs for any errors in the resolver action
+
+**Issue:** Tokens not showing in `!eggpack` or always show 0
+- **Solution:** Global variables are case-sensitive - verify exact naming
+- **Solution:** Check variable format: `{userId}_MysteryEgg` (not user name, must be user ID)
+- **Solution:** After buying tokens, check Settings → Variables to see if user variables were created
+- **Solution:** Ensure `persisted: true` is set in all SetGlobalVar calls
+
+**Issue:** Points not adding/removing correctly
+- **Solution:** Check Loyalty system is enabled in Streamer.bot Settings
+- **Solution:** Verify userId is being passed correctly (not username)
+- **Solution:** Check CPH.AddPoints and CPH.RemovePoints are using correct parameters
+- **Solution:** Review Streamer.bot logs for point transaction errors
+
+**Issue:** Random number generation always same
+- **Solution:** This is normal in testing when running quickly - Random() uses time-based seed
+- **Solution:** In production with real users at different times, this won't be an issue
+- **Solution:** For truly random testing, add small delays between tests
+
+**Issue:** Commands work for some users but not others
+- **Solution:** Check if Loyalty system treats different user types differently
+- **Solution:** Verify VIPs/Mods/Subs don't have conflicting command overrides
+- **Solution:** Test with a fresh account that has no special status
+
+**Issue:** Streamer.bot crashes or hangs
+- **Solution:** Check for infinite loops in code (all loops should have proper exit conditions)
+- **Solution:** Verify timers don't fire too frequently (minimum 1 second recommended)
+- **Solution:** Check Streamer.bot logs for memory or resource issues
+- **Solution:** Consider restarting Streamer.bot and Twitch connection
+
+### 6.3 Go-Live Steps
+
+**1. Enable All Commands:**
+   - Go through Commands tab
+   - Enable all economy commands
+   - Set appropriate cooldowns
+
+**2. Announce to Community:**
+   - Post explanation in Discord/social media
+   - Explain basic commands: `!eggs`, `!buy`, `!eggpack`
+   - Share game commands: `!chomp`, `!eggroll`, `!duelnest`
+
+**3. Monitor First Hour:**
+   - Watch for unusual behavior
+   - Check `!econfunds` periodically
+   - Be ready to disable commands if issues arise
+
+**4. Adjust as Needed:**
+   - If eggs inflate too fast: Reduce passive income rates
+   - If games played too often: Increase cooldowns
+   - If funds grow too large: Run special events/giveaways
+
+---
+
+## Quick Reference
 
 ### Command Summary
 | Command | Description | Cost |
@@ -1113,32 +1249,63 @@ CPH.SendMessage($"Economy Funds 💰: Big Nest Fund: {bigNestFund} | Egg Carton 
 | `!econfunds` | Check economy fund balances (Mod only) | Free |
 
 ### Token Costs
-- **Mystery Egg:** 20 Pouch Eggs
-- **Dice Egg:** 10 Pouch Eggs
-- **Duel Egg:** 5 Pouch Eggs
+- **Mystery Egg:** 20 Pouch Eggs (for Chomp Tunnel)
+- **Dice Egg:** 10 Pouch Eggs (for Hatch Roll)
+- **Duel Egg:** 5 Pouch Eggs (for Duel Nest PvP)
+
+### Progression Ranks
+- 🥚 **Hatchling:** 0-99 eggs
+- 🏃 **Egg Runner:** 100-499 eggs
+- 🏠 **Nest Builder:** 500-999 eggs
+- 🛡️ **Egg Guardian:** 1,000-2,499 eggs
+- ⚔️ **Yoshi Knight:** 2,500-4,999 eggs
+- 👑 **Grand Yoshi:** 5,000-9,999 eggs
+- 🌟 **Egg Emperor:** 10,000+ eggs
 
 ---
 
-## Implementation Notes
+## Implementation Checklist
 
-### Streamer.bot Setup Requirements
-1. **C# Scripting:** All actions use C# code for Streamer.bot.
-2. **Global Variables:** Initialize `bigNestFund` and `eggCartonJackpot` to 0.
-3. **Timer Actions:** Set up a timer to run the `[PVP] Duel Nest Resolver` action every 1 minute.
-4. **User Variables:** The system uses per-user global variables with the format `{userId}_{variableName}`.
+Use this to track your progress:
 
-### Testing Recommendations
-1. Test each command individually before enabling for all users.
-2. Start with small wager amounts in Duel Nest to ensure payouts work correctly.
-3. Monitor the economy funds regularly to ensure balance.
-4. Adjust passive income rates if inflation becomes an issue.
-
-### Future Enhancements
-- Add leaderboards for top players.
-- Implement seasonal events with special eggs.
-- Create team-based egg battles.
-- Add achievement system with egg rewards.
+- [ ] **Stage 1:** Configure currency and initialize global variables
+- [ ] **Stage 2:** Set up token purchase system (`!buy`)
+- [ ] **Stage 3.1:** Implement Chomp Tunnel game (`!chomp`)
+- [ ] **Stage 3.2:** Implement Hatch Roll game (`!eggroll`)
+- [ ] **Stage 3.3:** Implement Duel Nest PvP (`!duelnest`, `!accept`, resolver timer)
+- [ ] **Stage 4.1:** Set up leaderboard (`!top`)
+- [ ] **Stage 4.2:** Set up progression ranks (`!titles`)
+- [ ] **Stage 4.3:** Set up inventory command (`!eggpack`)
+- [ ] **Stage 4.4:** Set up stats command (`!sheet`)
+- [ ] **Stage 4.5:** Set up reset command (`!reroll`)
+- [ ] **Stage 5:** Set up economy monitoring (`!econfunds`)
+- [ ] **Stage 6:** Complete all testing
+- [ ] **Go Live:** Enable all commands and announce
 
 ---
 
-This unified guide provides everything needed to implement a complete, balanced egg-based economy in Streamer.bot. All components work together to create an engaging and sustainable system for your community!
+## Notes
+
+**All Features Run Within Streamer.bot:**
+- No external scripts or databases required
+- Everything uses Streamer.bot's built-in loyalty system
+- Global variables store user data
+- C# Execute Code actions handle all logic
+- Timed Actions handle automated processes
+
+**Support & Customization:**
+- Adjust reward amounts to fit your community
+- Modify cooldowns based on chat activity
+- Create custom ranks and titles
+- Add your own games using the same patterns
+
+**Future Enhancements:**
+- Seasonal events with special eggs
+- Team-based competitions
+- Achievement system
+- Bonus multiplier days
+- Special rare eggs with unique effects
+
+---
+
+**Congratulations!** You now have a complete, balanced egg-based economy system running entirely within Streamer.bot. Your community can earn, spend, and compete for eggs while you maintain a healthy, inflation-resistant economy!

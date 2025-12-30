@@ -1,0 +1,21 @@
+{
+  "name": "Yoshi's Island Eggonomy - Complete System",
+  "version": "1.0.1",
+  "description": "Complete egg-based economy system with games, tokens, PvP, and DnD adventure",
+  "actions": [],
+  "commands": [],
+  "variables": [
+    {
+      "name": "bigNestFund",
+      "value": 1000,
+      "type": "number",
+      "persisted": true
+    },
+    {
+      "name": "eggCartonJackpot",
+      "value": 500,
+      "type": "number",
+      "persisted": true
+    }
+  ]
+}

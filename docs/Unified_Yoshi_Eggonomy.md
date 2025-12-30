@@ -55,8 +55,14 @@ The token system includes three token types, purchased using Pouch Eggs:
 2. **Add the Token-Purchase Logic:**
     ```csharp
     // Parse user input
-    string tokenType = args["rawInput0"].ToString(); // e.g., "MysteryEgg"
-    int quantity = Convert.ToInt32(args["rawInput1"]); // e.g., 1
+    string tokenType = args["rawInput0"]?.ToString(); // e.g., "MysteryEgg"
+    
+    // Validate quantity input
+    if (args["rawInput1"] == null || !int.TryParse(args["rawInput1"].ToString(), out int quantity) || quantity < 1)
+    {
+        CPH.SendMessage($"@{args["userName"]}, please specify a valid quantity! Example: !buy MysteryEgg 1");
+        return false;
+    }
     
     // Define token costs
     Dictionary<string, int> tokenCosts = new Dictionary<string, int>
@@ -304,8 +310,21 @@ The token system includes three token types, purchased using Pouch Eggs:
     ```csharp
     string challengerId = args["userId"].ToString();
     string challengerName = args["userName"].ToString();
-    string opponentName = args["rawInput0"].ToString().TrimStart('@');
-    int wager = Convert.ToInt32(args["rawInput1"]);
+    string opponentName = args["rawInput0"]?.ToString().TrimStart('@');
+    
+    // Validate wager input
+    if (args["rawInput1"] == null || !int.TryParse(args["rawInput1"].ToString(), out int wager) || wager < 1)
+    {
+        CPH.SendMessage($"@{challengerName}, please specify a valid wager amount! Example: !duelnest @user 50");
+        return false;
+    }
+    
+    // Validate opponent name
+    if (string.IsNullOrEmpty(opponentName))
+    {
+        CPH.SendMessage($"@{challengerName}, please specify an opponent! Example: !duelnest @user 50");
+        return false;
+    }
     
     // Validate wager
     if (wager < 1)
@@ -332,8 +351,9 @@ The token system includes three token types, purchased using Pouch Eggs:
         return false;
     }
     
-    // Get opponent user ID (this would need to be fetched from Twitch API in real implementation)
-    // For this example, we'll store the challenge and wait for accept
+    // Get opponent user ID
+    // Note: In Streamer.bot, you can use CPH.GetUserIdForName(opponentName) to validate the user exists
+    // Alternatively, the accept command will validate the opponent when they try to accept
     
     // Store challenge details
     CPH.SetGlobalVar($"duel_challenger", challengerId, true);
@@ -506,7 +526,14 @@ The token system includes three token types, purchased using Pouch Eggs:
     - **Command for Accept:** `!accept`
     - **Permissions:** Everyone
     - **Cooldown:** 30 seconds per user
-    - **Set up a timer:** Create a timed action that runs `[PVP] Duel Nest Resolver` every 1 minute
+    
+8. **Set up Timer for Auto-Resolution:**
+    - In Streamer.bot, go to `Actions > Timed Actions`
+    - Create a new timed action
+    - Set it to run every **1 minute** (or 60 seconds)
+    - Link it to the `[PVP] Duel Nest Resolver` action
+    - Enable the timer
+    - This will check for duels that need to be resolved every minute
 
 ---
 

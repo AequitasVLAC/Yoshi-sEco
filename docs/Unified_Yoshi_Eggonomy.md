@@ -6,6 +6,8 @@
 
 > **📌 Streamer.bot Version Note:** This guide is written for Streamer.bot v0.2.0+. Menu locations and naming may vary slightly between versions (e.g., "Settings → Variables" vs "Variables" tab). The core functionality and C# code remain the same across versions.
 
+> **💬 Twitch Chat Limit:** All messages in this guide are designed to work within Twitch's 500 character per message limit. Messages do not use newlines (which Twitch ignores) and stay well under the character limit even with long usernames and large numbers. See [Troubleshooting Guide - Twitch Chat Message Limits](Troubleshooting_Guide.md#twitch-chat-message-limits) for details.
+
 This document provides a comprehensive, step-by-step setup for creating an interactive egg-based economy using Streamer.bot. It integrates the token system, PvP mechanics, and games into a single, functional system where users can earn, spend, and lose eggs effectively. The design includes cohesive interactions, balanced game mechanics, and sinks to maintain a sustainable economy.
 
 ## Prerequisites

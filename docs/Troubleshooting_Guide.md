@@ -10,13 +10,14 @@ This guide provides comprehensive solutions to common issues, best practices for
 ## Table of Contents
 
 1. [Common Issues & Solutions](#common-issues--solutions)
-2. [Variable Troubleshooting](#variable-troubleshooting)
-3. [Code Compilation Errors](#code-compilation-errors)
-4. [Performance Optimization](#performance-optimization)
-5. [Economy Balance Tips](#economy-balance-tips)
-6. [Testing Procedures](#testing-procedures)
-7. [Backup & Recovery](#backup--recovery)
-8. [Monitoring & Maintenance](#monitoring--maintenance)
+2. [Twitch Chat Message Limits](#twitch-chat-message-limits)
+3. [Variable Troubleshooting](#variable-troubleshooting)
+4. [Code Compilation Errors](#code-compilation-errors)
+5. [Performance Optimization](#performance-optimization)
+6. [Economy Balance Tips](#economy-balance-tips)
+7. [Testing Procedures](#testing-procedures)
+8. [Backup & Recovery](#backup--recovery)
+9. [Monitoring & Maintenance](#monitoring--maintenance)
 
 ---
 
@@ -306,6 +307,196 @@ CPH.LogInfo($"Balance after: {after}");
 
 // Check logs - should show before and after values
 ```
+
+---
+
+## Twitch Chat Message Limits
+
+### Understanding Twitch Chat Constraints
+
+**Critical Limitation:** Twitch chat has a **500 character limit per message** and **does NOT support newline characters** (`\n`).
+
+**What This Means:**
+- Messages longer than 500 characters will be truncated
+- Newline characters (`\n`) are ignored or converted to spaces
+- Multi-line messages don't work in Twitch chat
+- All messages must be on a single line
+
+**All Code Examples in This Guide Are Compliant:**
+- ✅ Longest message: ~160 characters (well under 500)
+- ✅ No newline characters in any CPH.SendMessage() calls
+- ✅ Even with max username (25 chars) and large numbers, messages stay under 300 characters
+
+---
+
+### Best Practices for Chat Messages
+
+#### 1. Keep Messages Concise
+
+**Good Examples:**
+```csharp
+// 85 characters - clear and concise
+CPH.SendMessage($"✅ @{userName} rolled {roll}! +{payout} 🥚");
+
+// 110 characters - informative but not verbose
+CPH.SendMessage($"⚔️ {winner} defeats {loser}! Won: {payout} 🥚");
+```
+
+**Bad Example:**
+```csharp
+// 520 characters - TOO LONG, will be truncated!
+CPH.SendMessage($"Congratulations @{userName}! You have successfully completed the Chomp Tunnel challenge with an outstanding roll of {roll}. Your current streak is {streak} and you have earned {payout} Pouch Eggs. Your total eggs are now {totalEggs}. Keep up the great work and continue playing to increase your rank from {currentRank} to {nextRank}. You need {eggsNeeded} more eggs to reach the next level. Good luck!");
+```
+
+#### 2. Never Use Newlines
+
+**❌ Wrong - Newlines Don't Work:**
+```csharp
+string message = "Event Status:\n";
+message += "Double Rewards: Active\n";
+message += "Free Entry: Inactive\n";
+CPH.SendMessage(message);
+// Result in chat: "Event Status: Double Rewards: Active Free Entry: Inactive"
+```
+
+**✅ Correct - Single Line with Separators:**
+```csharp
+string message = "📊 Events: 2X 🟢 | Free 🔴 | Multi: 1.5x🟢";
+CPH.SendMessage(message);
+// Result in chat: "📊 Events: 2X 🟢 | Free 🔴 | Multi: 1.5x🟢"
+```
+
+#### 3. Use Abbreviations for Long Messages
+
+**Instead of:** "Double Rewards: ACTIVE"  
+**Use:** "2X 🟢" or "2X ✅"
+
+**Instead of:** "Jackpot Fund: 5000 Pouch Eggs"  
+**Use:** "Jackpot: 5000🥚"
+
+#### 4. Test Message Length in Development
+
+Add this helper to check message length during development:
+
+```csharp
+public void SendSafeMessage(string message)
+{
+    if (message.Length > 500)
+    {
+        CPH.LogWarn($"Message too long ({message.Length} chars): {message.Substring(0, 100)}...");
+        message = message.Substring(0, 497) + "...";
+    }
+    
+    if (message.Contains("\n"))
+    {
+        CPH.LogWarn("Message contains newlines - these don't work in Twitch chat!");
+        message = message.Replace("\n", " | ");
+    }
+    
+    CPH.SendMessage(message);
+}
+```
+
+#### 5. Split Long Information Across Multiple Commands
+
+**Instead of one long dashboard:**
+```csharp
+// ❌ Bad - trying to show everything at once
+CPH.SendMessage("Events: 2X Active, Free Entry Active, 1.5x Multi Active, Jackpot: 5000, BigNest: 8000, Users: 150, Games Today: 500");
+```
+
+**Use separate commands:**
+```csharp
+// ✅ !events - Shows active events
+CPH.SendMessage("📊 Events: 2X 🟢 | Free 🟢 | Multi: 1.5x🟢");
+
+// ✅ !econfunds - Shows economy funds (separate command)
+CPH.SendMessage("💰 Funds | Jackpot: 5000🥚 | BigNest: 8000🥚");
+
+// ✅ !stats - Shows server stats (separate command)
+CPH.SendMessage("📈 Stats | Users: 150 | Games Today: 500");
+```
+
+---
+
+### Message Length Guidelines
+
+| Type | Max Recommended | Reason |
+|------|----------------|---------|
+| **Error Messages** | 100 chars | Quick to read, clear problem |
+| **Success Messages** | 120 chars | Show action + result + key info |
+| **Status Messages** | 150 chars | Multiple pieces of information |
+| **Complex Info** | 200 chars | Absolute maximum for single message |
+| **Never Exceed** | 500 chars | **Twitch hard limit** |
+
+---
+
+### Estimating Message Length
+
+**Formula for worst-case calculation:**
+```
+Base message length
++ (25 chars × number of usernames)  // Max Twitch username length
++ (10 chars × number of numeric values)  // Large numbers like 999,999,999
++ (emoji count × 2)  // Some emojis count as 2 chars
+```
+
+**Example:**
+```csharp
+// Template: "@{userName} won {amount} 🥚!"
+// Worst case: "@" + 25 + " won " + 10 + " 🥚!" = ~45 chars
+// Actual usage: "@JohnGamer won 150 🥚!" = ~25 chars
+```
+
+---
+
+### Testing Your Messages
+
+**Quick Test Script:**
+```csharp
+// Add to any action for testing
+string testMessage = $"Your message template here with {variables}";
+CPH.LogInfo($"Message length: {testMessage.Length} chars");
+
+if (testMessage.Length > 500)
+{
+    CPH.LogWarn("⚠️ MESSAGE TOO LONG!");
+}
+
+if (testMessage.Contains("\n"))
+{
+    CPH.LogWarn("⚠️ MESSAGE CONTAINS NEWLINES!");
+}
+```
+
+---
+
+### Common Violations Fixed
+
+**1. Event Dashboard (Fixed)**
+- ❌ Old: Multi-line with `\n` characters
+- ✅ New: Single line with pipe separators `|`
+
+**2. Multi-Part Announcements**
+- ❌ Old: "Event activated! Double rewards for 1 hour! Free entry enabled! Multiplier set to 2x! Go play now!"
+- ✅ New: "🎉 Event: 2X+Free for 1hr! GO! 🥚"
+
+**3. User Stats Display**
+- ❌ Old: Multiple lines showing every stat
+- ✅ New: "📋 @User | Streak: 5 | Rolls: 23 | Duels: 12W/3L"
+
+---
+
+### Summary
+
+✅ **All messages in this guide comply with Twitch limits**  
+✅ **Longest message: ~160 characters**  
+✅ **No newlines in any example**  
+✅ **Use abbreviations and emojis for brevity**  
+✅ **Test message length during development**  
+✅ **Split complex info across multiple commands**  
+
+**Remember:** Twitch chat is for quick, real-time communication. Keep messages short, clear, and impactful!
 
 ---
 

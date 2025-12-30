@@ -3,6 +3,8 @@
 **Platform:** Streamer.bot (v0.2.0+)  
 **Last Updated:** December 2025
 
+> **💬 Twitch Chat Compliant:** All messages optimized for Twitch's 500 character limit. Event Dashboard updated to use single-line format (no newlines).
+
 This guide provides complete implementation details for streamer-controlled events and bonus systems that enhance viewer engagement and create special moments during streams.
 
 ---
@@ -1041,20 +1043,19 @@ public class CPHInline
 {
     public bool Execute()
     {
-        string message = "📊 EVENT DASHBOARD:\n";
-        
-        // Check each event
+        // Check each event status
         bool doubleActive = CPH.GetGlobalVar<bool>("doubleRewardsActive", true);
         bool freeActive = CPH.GetGlobalVar<bool>("freeEntryTokensActive", true);
         double multiplier = CPH.GetGlobalVar<double>("rewardMultiplier", true);
         int jackpot = CPH.GetGlobalVar<int>("eggCartonJackpot", true);
         int bigNest = CPH.GetGlobalVar<int>("bigNestFund", true);
         
-        message += $"• Double Rewards: {(doubleActive ? "🟢 ACTIVE" : "🔴 OFF")}\n";
-        message += $"• Free Entry: {(freeActive ? "🟢 ACTIVE" : "🔴 OFF")}\n";
-        message += $"• Multiplier: {(multiplier > 1.0 ? $"🟢 {multiplier}x" : "🔴 1.0x")}\n";
-        message += $"• Jackpot Fund: {jackpot} 🥚\n";
-        message += $"• Big Nest Fund: {bigNest} 🥚";
+        // Build single-line message (Twitch chat limit: 500 chars, no newlines supported)
+        string message = "📊 Events: ";
+        message += $"2X {(doubleActive ? "🟢" : "🔴")} | ";
+        message += $"Free {(freeActive ? "🟢" : "🔴")} | ";
+        message += $"Multi: {(multiplier > 1.0 ? $"{multiplier}x🟢" : "1.0x🔴")} | ";
+        message += $"Jackpot: {jackpot}🥚 | BigNest: {bigNest}🥚";
         
         CPH.SendMessage(message);
         

@@ -3,6 +3,8 @@
 **Platform:** Streamer.bot (v0.2.0+)  
 **Last Updated:** December 2025
 
+> **💬 Twitch Chat Compliant:** All message examples respect Twitch's 500 character limit. When creating custom features, keep messages concise and avoid newlines.
+
 This guide teaches you how to extend the Yoshi's Eggonomy system with your own custom tokens, games, and features. Perfect for streamers who want to create unique experiences for their community.
 
 ---

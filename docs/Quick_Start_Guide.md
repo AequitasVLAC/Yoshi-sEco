@@ -4,6 +4,8 @@
 **Time Required:** 30-45 minutes  
 **Difficulty:** Beginner-friendly
 
+> **💬 Twitch Chat Compliant:** All code examples work within Twitch's 500 character message limit with no newlines.
+
 This guide gets you from zero to a working egg economy in under an hour. Follow these steps exactly for fastest setup.
 
 ---

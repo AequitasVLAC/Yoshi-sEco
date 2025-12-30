@@ -300,8 +300,10 @@ public class CPHInline
 
 ### Command 1: View Inventory (!eggpack)
 
+Shows user's complete inventory including **Pouch Eggs** (primary currency) and all token types.
+
 **Create Action:**
-1. **Actions** → **Add** → Name: `[USER] View Inventory`
+1. **Actions** → **Add** → Name: `[USER] View Inventory` (Alternative: `[ECON] Show Egg Pack`)
 2. **Add Sub-Action** → **Execute Code**
 3. Paste:
 
@@ -315,11 +317,15 @@ public class CPHInline
         string userId = args["userId"].ToString();
         string userName = args["userName"].ToString();
         
+        // Get token counts from global variables
         int mysteryEggs = CPH.GetGlobalVar<int>($"{userId}_MysteryEgg", true);
         int diceEggs = CPH.GetGlobalVar<int>($"{userId}_DiceEgg", true);
         int duelEggs = CPH.GetGlobalVar<int>($"{userId}_DuelEgg", true);
+        
+        // Get Pouch Eggs from Streamer.bot's loyalty points system (primary currency)
         int pouchEggs = CPH.GetPoints(userId);
         
+        // Display complete inventory: Pouch Eggs first, then all token types
         CPH.SendMessage($"@{userName}'s Egg Pack 🎒 | {pouchEggs} 🥚 | {mysteryEggs} Mystery 🔮 | {diceEggs} Dice 🎲 | {duelEggs} Duel ⚔️");
         
         return true;
@@ -440,7 +446,7 @@ Run these tests in order:
 
 3. **Inventory Test**
    ```
-   !eggpack  → Shows 2 Mystery Eggs
+   !eggpack  → Shows Pouch Eggs + 2 Mystery Eggs + other tokens
    ```
 
 4. **Game Test**
@@ -521,7 +527,7 @@ Now that core system works, you can:
 | `!eggs` | Check balance | Everyone |
 | `!buy <token> <qty>` | Buy tokens | Everyone |
 | `!chomp` | Play Chomp Tunnel | Everyone (needs Mystery Egg) |
-| `!eggpack` | View inventory | Everyone |
+| `!eggpack` | View full inventory (Pouch Eggs + tokens) | Everyone |
 | `!titles` | View rank | Everyone |
 | `!econfunds` | Check economy funds | Moderators only |
 
@@ -534,7 +540,7 @@ You have a working economy if:
 - ✅ Users earn eggs passively while watching
 - ✅ Users can buy tokens with `!buy`
 - ✅ Users can play games with tokens
-- ✅ Users can check inventory with `!eggpack`
+- ✅ Users can check full inventory (Pouch Eggs + tokens) with `!eggpack`
 - ✅ Users can view ranks with `!titles`
 - ✅ You can monitor economy with `!econfunds`
 

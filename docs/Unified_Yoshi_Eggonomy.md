@@ -1172,13 +1172,13 @@ public class CPHInline
 
 ### 4.3 View Inventory - `!eggpack`
 
-Displays user's current token and egg balances.
+Displays user's complete inventory including **Pouch Eggs** (the primary currency from Streamer.bot's loyalty system) and all token counts (Mystery Eggs, Dice Eggs, Duel Eggs).
 
 #### Step-by-Step Setup:
 
 **1. Create the Action:**
    - Go to: `Actions` tab → Click **Add**
-   - **Action Name:** `[USER] View Inventory`
+   - **Action Name:** `[USER] View Inventory` (Alternative: `[ECON] Show Egg Pack`)
    - Click **OK**
 
 **2. Add Execute Code Sub-Action:**
@@ -1195,11 +1195,15 @@ public class CPHInline
         string userId = args["userId"].ToString();
         string userName = args["userName"].ToString();
         
+        // Get token counts from global variables
         int mysteryEggs = CPH.GetGlobalVar<int>($"{userId}_MysteryEgg", true);
         int diceEggs = CPH.GetGlobalVar<int>($"{userId}_DiceEgg", true);
         int duelEggs = CPH.GetGlobalVar<int>($"{userId}_DuelEgg", true);
+        
+        // Get Pouch Eggs from Streamer.bot's loyalty points system (primary currency)
         int pouchEggs = CPH.GetPoints(userId);
         
+        // Display complete inventory: Pouch Eggs first, then all token types
         CPH.SendMessage($"@{userName}'s Egg Pack 🎒 | {pouchEggs} 🥚 | {mysteryEggs} Mystery 🔮 | {diceEggs} Dice 🎲 | {duelEggs} Duel ⚔️");
         
         return true;
@@ -1521,7 +1525,7 @@ Complete these tests in Streamer.bot **before going live:**
 | `!accept` | Accept a duel challenge | 1 Duel Egg + wager |
 | `!top` | View leaderboard of top egg holders | Free |
 | `!titles` | View rank progression and your current rank | Free |
-| `!eggpack` | View your inventory | Free |
+| `!eggpack` | View full inventory (Pouch Eggs + all tokens) | Free |
 | `!sheet` | View your character stats | Free |
 | `!reroll` | Reset your character | 1,000 Pouch Eggs |
 | `!econfunds` | Check economy fund balances (Mod only) | Free |

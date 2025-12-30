@@ -181,7 +181,7 @@ Everything plus events and custom features:
 | `!accept` | Accept a duel challenge | 1 Duel Egg + wager |
 | `!top` | View leaderboard | Free |
 | `!titles` | View rank progression | Free |
-| `!eggpack` | View inventory | Free |
+| `!eggpack` | View full inventory (Pouch Eggs + all tokens) | Free |
 | `!sheet` | View character stats | Free |
 | `!reroll` | Reset character | 1,000 Pouch Eggs |
 | `!econfunds` | Check economy funds (Mod only) | Free |

@@ -300,8 +300,10 @@ public class CPHInline
 
 ### Command 1: View Inventory (!eggpack)
 
+Shows user's complete inventory including **Pouch Eggs** (primary currency) and all token types.
+
 **Create Action:**
-1. **Actions** → **Add** → Name: `[USER] View Inventory`
+1. **Actions** → **Add** → Name: `[USER] View Inventory` (Alternative: `[ECON] Show Egg Pack`)
 2. **Add Sub-Action** → **Execute Code**
 3. Paste:
 
@@ -315,11 +317,15 @@ public class CPHInline
         string userId = args["userId"].ToString();
         string userName = args["userName"].ToString();
         
+        // Get token counts from global variables
         int mysteryEggs = CPH.GetGlobalVar<int>($"{userId}_MysteryEgg", true);
         int diceEggs = CPH.GetGlobalVar<int>($"{userId}_DiceEgg", true);
         int duelEggs = CPH.GetGlobalVar<int>($"{userId}_DuelEgg", true);
+        
+        // Get Pouch Eggs from Streamer.bot's loyalty points system (primary currency)
         int pouchEggs = CPH.GetPoints(userId);
         
+        // Display complete inventory: Pouch Eggs first, then all token types
         CPH.SendMessage($"@{userName}'s Egg Pack 🎒 | {pouchEggs} 🥚 | {mysteryEggs} Mystery 🔮 | {diceEggs} Dice 🎲 | {duelEggs} Duel ⚔️");
         
         return true;

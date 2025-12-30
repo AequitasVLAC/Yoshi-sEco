@@ -6,6 +6,8 @@
 
 > **📌 Streamer.bot Version Note:** This guide is written for Streamer.bot v0.2.0+. Menu locations and naming may vary slightly between versions (e.g., "Settings → Variables" vs "Variables" tab). The core functionality and C# code remain the same across versions.
 
+> **💬 Twitch Chat Limit:** All messages in this guide are designed to work within Twitch's 500 character per message limit. Messages do not use newlines (which Twitch ignores) and stay well under the character limit even with long usernames and large numbers. See [Troubleshooting Guide - Twitch Chat Message Limits](Troubleshooting_Guide.md#twitch-chat-message-limits) for details.
+
 This document provides a comprehensive, step-by-step setup for creating an interactive egg-based economy using Streamer.bot. It integrates the token system, PvP mechanics, and games into a single, functional system where users can earn, spend, and lose eggs effectively. The design includes cohesive interactions, balanced game mechanics, and sinks to maintain a sustainable economy.
 
 ## Prerequisites
@@ -66,12 +68,22 @@ Follow these steps in order for a working implementation:
 
 ## Key Features
 - **Main Currency:** Pouch Eggs (earned passively by viewers).
-- **Token System:** Playable-game tokens (Mystery Eggs, Dice Eggs, Duel Eggs).
+- **Token System:** Playable-game tokens (Mystery Eggs, Dice Eggs, Duel Eggs) - expandable with custom tokens.
 - **Games:** Fun and rewarding games like Chomp Tunnel, Hatch Roll, and PvP battles.
-- **Leaderboard & Ranks:** Track top players and progression through 7 rank tiers.
+- **Event System:** Double Rewards, Free Entry, and custom multipliers for special occasions.
+- **Leaderboard & Ranks:** Track top players and progression through 7 rank tiers (expandable).
 - **Balanced Economy:** Currency sinks to manage inflation and ensure long-term viability.
 - **PvP with Timer-Based Resolution:** The Duel Nest PvP system is resolved automatically within 10 minutes.
 - **Interactive Commands:** Clear and consistent commands for users to interact with the system.
+- **Advanced Features:** Achievements, teams, season pass, and more (see Advanced Features Guide).
+
+## Additional Documentation
+
+This guide focuses on core implementation. For advanced features and expansions, see:
+
+📚 **[Variable Reference](Variable_Reference.md)** - Complete documentation of all 175+ variables used in the system  
+📚 **[Event System Guide](Event_System_Guide.md)** - Streamer-controlled events like Double Rewards and Free Entry  
+📚 **[Advanced Features Guide](Advanced_Features_Guide.md)** - Custom tokens, new games, achievements, teams, and integrations
 
 ---
 
@@ -101,6 +113,15 @@ Follow these steps in order for a working implementation:
 
 ### 1.2 Initialize Global Variables
 
+Global variables in Streamer.bot store data that persists across restarts. They're essential for tracking economy funds, event states, and user data.
+
+**How Variables Work in Streamer.bot:**
+- Stored in Streamer.bot's internal SQLite database
+- Persist through application restarts automatically
+- Case-sensitive naming (e.g., `bigNestFund` ≠ `bignestfund`)
+- Accessed via UI or C# code
+- No size limit for practical use (thousands of variables supported)
+
 **Step-by-Step Instructions:**
 
 1. In Streamer.bot, go to: `Settings` → `Variables`
@@ -108,31 +129,200 @@ Follow these steps in order for a working implementation:
 2. Look for **Global Variables** section
 3. Click **Add** or **+** button to create new variables
 
-   **Variable 1:**
+   **Variable 1: bigNestFund**
    - **Name:** `bigNestFund`
-   - **Value/Type:** Number with value `1000`
+   - **Value/Type:** Number (Integer) with value `1000`
    - **Persisted:** ✅ Yes (check "Persist" if available)
+   - **Purpose:** Primary economy fund that collects 70% of all token purchases
+   - **Usage:** Special events, giveaways, community rewards
+   - **Expected Growth:** Increases ~14 eggs per token sold
    
-   **Variable 2:**
+   **Variable 2: eggCartonJackpot**
    - **Name:** `eggCartonJackpot`
-   - **Value/Type:** Number with value `500`
+   - **Value/Type:** Number (Integer) with value `500`
    - **Persisted:** ✅ Yes (check "Persist" if available)
+   - **Purpose:** Jackpot fund that collects 20% of all token purchases
+   - **Usage:** Lottery events, milestone rewards
+   - **Expected Growth:** Increases ~4 eggs per token sold
 
 4. Click **Save** or **OK**
 
 **Verify:** After creating, you should see both variables listed with their values.
 
-**Note:** These funds collect token purchase fees and can be used for special events or giveaways.
+**Additional Information:**
+
+**Fund Distribution Formula (from token purchases):**
+- 70% → `bigNestFund` (economy reserve for streamer-controlled rewards)
+- 20% → `eggCartonJackpot` (jackpot fund for special events)
+- 10% → Removed from circulation (inflation control)
+
+**Variable Naming Convention:**
+- Global economy variables use `camelCase` (e.g., `bigNestFund`)
+- User-specific variables use `{userId}_camelCase` (e.g., `12345678_MysteryEgg`)
+- Temporary state variables use `context_camelCase` (e.g., `duel_challenger`)
+
+**⚠️ IMPORTANT:**  Always use **user IDs** (not usernames) for user-specific variables. User IDs never change, but usernames can be changed by users, which would cause data loss.
+
+For complete variable documentation, see: [Variable Reference](Variable_Reference.md)
+
+---
+
+### 1.3 Understanding Data Persistence in Streamer.bot
+
+**How Your Data Is Stored:**
+
+Streamer.bot uses an embedded SQLite database to store all global variables. This means:
+
+✅ **Automatic Persistence** - Variables survive Streamer.bot restarts  
+✅ **No Manual Database Management** - Everything handled internally  
+✅ **Backup Friendly** - Database files are in `%AppData%\Streamer.bot\`  
+✅ **Reliable Storage** - SQLite is battle-tested and production-ready  
+⚠️ **Case Sensitive** - Variable names must match exactly  
+
+**Database Location:**
+- **Windows:** `%AppData%\Streamer.bot\` (usually `C:\Users\YourName\AppData\Roaming\Streamer.bot\`)
+- **Files:** Look for SQLite database files (`.db` or `.sqlite` extensions)
+
+**Backup Best Practices:**
+
+1. **Before Major Updates:**
+   - Close Streamer.bot
+   - Copy entire `Streamer.bot` folder to backup location
+   - Reopen Streamer.bot
+
+2. **Regular Schedule:**
+   - Weekly backups recommended for active streams
+   - Keep last 3-4 backups rotating
+
+3. **Before Testing New Features:**
+   - Always backup before adding complex actions
+   - Test with small amounts first
+
+4. **Restore Process:**
+   - Close Streamer.bot
+   - Replace folder contents with backup
+   - Restart Streamer.bot
+
+**Variable Access Methods:**
+
+**Via Streamer.bot UI:**
+```
+Settings → Variables → Global Variables
+- View all variables
+- Edit values manually
+- Delete unused variables
+```
+
+**Via C# Code (in actions):**
+```csharp
+// Get a variable (returns default if doesn't exist)
+int value = CPH.GetGlobalVar<int>("variableName", persisted: true);
+
+// Set a variable (persisted: true makes it permanent)
+CPH.SetGlobalVar("variableName", value, persisted: true);
+
+// Delete a variable
+CPH.UnsetGlobalVar("variableName", persisted: true);
+```
+
+**⚠️ CRITICAL:** Always set `persisted: true` parameter when working with variables that should survive restarts!
+
+**Example - Correct vs Incorrect:**
+```csharp
+// ❌ WRONG - Variable lost on restart
+CPH.SetGlobalVar("myVariable", 100, false);
+
+// ✅ CORRECT - Variable persists
+CPH.SetGlobalVar("myVariable", 100, true);
+```
 
 ---
 
 ## Stage 2: Token System (15 minutes)
 
+### 2.0 Understanding the Token Economy
+
+The token system creates a secondary economy layer that:
+- Requires upfront investment (buy tokens with Pouch Eggs)
+- Creates entry barriers for games (you must have tokens to play)
+- Introduces scarcity (tokens are consumed when used)
+- Generates currency sinks (10% of purchases removed permanently)
+
+**Token Flow Diagram:**
+```
+Viewer earns Pouch Eggs (passive income)
+         ↓
+Viewer buys tokens (!buy command)
+         ↓
+Token stored in user's inventory
+         ↓
+Viewer plays game with token
+         ↓
+Token consumed, rewards earned
+```
+
+**Why Use Tokens Instead of Direct Pouch Egg Costs?**
+
+1. **Psychological Commitment** - Buying tokens feels like "gearing up" for adventure
+2. **Batch Purchasing** - Players can stock up during downtime
+3. **Economy Control** - Streamer controls token costs independently from game rewards
+4. **Clarity** - Players always know what's required for each game
+5. **Collectibility** - Tokens can become status symbols ("I have 50 Mystery Eggs!")
+
+---
+
 ### 2.1 Token Definitions
+
 The token system includes three token types, purchased using Pouch Eggs:
-- **Mystery Eggs:** Cost 20 eggs, used in the *Chomp Tunnel* game.
-- **Dice Eggs:** Cost 10 eggs, used in the *Hatch Roll* game.
-- **Duel Eggs:** Cost 5 eggs, used in the PvP Duel Nest.
+
+**Mystery Eggs**
+- **Cost:** 20 Pouch Eggs each
+- **Used In:** Chomp Tunnel game
+- **Variable Format:** `{userId}_MysteryEgg`
+- **Example:** User ID `12345678` owns 3 tokens → Variable `12345678_MysteryEgg` = `3`
+- **Theme:** Mystery and risk (you don't know if Chain Chomp will eat it!)
+
+**Dice Eggs**  
+- **Cost:** 10 Pouch Eggs each
+- **Used In:** Hatch Roll game
+- **Variable Format:** `{userId}_DiceEgg`
+- **Example:** User ID `12345678` owns 5 tokens → Variable `12345678_DiceEgg` = `5`
+- **Theme:** Luck and probability (roll the dice to see what hatches!)
+
+**Duel Eggs**
+- **Cost:** 5 Pouch Eggs each
+- **Used In:** Duel Nest PvP battles
+- **Variable Format:** `{userId}_DuelEgg`
+- **Example:** User ID `12345678` owns 10 tokens → Variable `12345678_DuelEgg` = `10`
+- **Theme:** Competition and glory (challenge others to battle!)
+
+**Token Pricing Strategy:**
+
+The prices are designed to balance accessibility with value:
+- Duel Eggs (5 🥚) - Cheapest, encourages PvP participation
+- Dice Eggs (10 🥚) - Medium price, moderate risk/reward game
+- Mystery Eggs (20 🥚) - Premium price, high-streak potential game
+
+**Cost-Benefit Analysis:**
+```
+Token Type    | Cost | Avg Expected Value* | ROI** | Risk
+--------------|------|---------------------|-------|------
+Mystery Egg   | 20🥚 | ~25🥚 per play     | 125%  | High
+Dice Egg      | 10🥚 | ~20🥚 per play     | 200%  | Low
+Duel Egg      | 5🥚  | ~8🥚 per play      | 160%  | Medium
+
+*Expected value assumes average rolls/outcomes
+**ROI = Return on Investment percentage
+```
+
+**Variable Storage Details:**
+
+All token counts are stored as **integers** with these characteristics:
+- **Type:** `int` (32-bit integer)
+- **Range:** 0 to 2,147,483,647 (more than enough!)
+- **Default:** 0 (if variable doesn't exist)
+- **Persisted:** Always `true` (must survive restarts)
+- **Access:** Via `CPH.GetGlobalVar<int>()` and `CPH.SetGlobalVar()`
 
 ### 2.2 Buy Token Command - `!buy`
 
@@ -156,6 +346,8 @@ The token system includes three token types, purchased using Pouch Eggs:
    - Choose: `Core` → `C#` → `Execute Code`
    - In the code window, **DELETE ALL DEFAULT CODE** and paste this:
 
+**Complete Code with Detailed Comments:**
+
 ```csharp
 using System;
 using System.Collections.Generic;
@@ -164,27 +356,53 @@ public class CPHInline
 {
     public bool Execute()
     {
-        // Parse user input
+        // ═══════════════════════════════════════════════════════════
+        // STEP 1: PARSE USER INPUT
+        // ═══════════════════════════════════════════════════════════
+        
+        // Get user information from Twitch event
+        // userId = Unique Twitch user ID (never changes)
+        // userName = Display name (can change)
         string userId = args["userId"].ToString();
         string userName = args["userName"].ToString();
-        string tokenType = args["rawInput0"]?.ToString(); // e.g., "MysteryEgg"
         
-        // Validate quantity input
+        // Get command arguments
+        // rawInput0 = First word after !buy (token type)
+        // rawInput1 = Second word after !buy (quantity)
+        // Example: "!buy MysteryEgg 5" → rawInput0="MysteryEgg", rawInput1="5"
+        string tokenType = args["rawInput0"]?.ToString(); 
+        
+        // ═══════════════════════════════════════════════════════════
+        // STEP 2: VALIDATE QUANTITY INPUT
+        // ═══════════════════════════════════════════════════════════
+        
+        // Check if quantity argument exists and is a valid number
         if (args["rawInput1"] == null || !int.TryParse(args["rawInput1"].ToString(), out int quantity) || quantity < 1)
         {
             CPH.SendMessage($"@{userName}, please specify a valid quantity! Example: !buy MysteryEgg 1");
             return false;
         }
         
-        // Define token costs
+        // ═══════════════════════════════════════════════════════════
+        // STEP 3: DEFINE TOKEN COSTS
+        // ═══════════════════════════════════════════════════════════
+        
+        // Dictionary stores token types and their costs
+        // KEY = Token name (case-insensitive matching later)
+        // VALUE = Cost in Pouch Eggs
         Dictionary<string, int> tokenCosts = new Dictionary<string, int>
         {
-            {"MysteryEgg", 20},
-            {"DiceEgg", 10},
-            {"DuelEgg", 5}
+            {"MysteryEgg", 20},  // Premium token for Chomp Tunnel
+            {"DiceEgg", 10},     // Standard token for Hatch Roll
+            {"DuelEgg", 5}       // Cheap token for PvP battles
         };
         
-        // Validate token type (case-insensitive)
+        // ═══════════════════════════════════════════════════════════
+        // STEP 4: VALIDATE TOKEN TYPE (CASE-INSENSITIVE)
+        // ═══════════════════════════════════════════════════════════
+        
+        // Find matching token type, ignoring case
+        // This allows "mysteryegg", "MysteryEgg", "MYSTERYEGG" to all work
         string tokenKey = null;
         foreach (var key in tokenCosts.Keys)
         {
@@ -195,40 +413,77 @@ public class CPHInline
             }
         }
         
+        // If no match found, inform user of valid options
         if (tokenKey == null)
         {
             CPH.SendMessage($"@{userName}, invalid token type! Use: MysteryEgg, DiceEgg, or DuelEgg");
             return false;
         }
         
-        // Calculate total cost
+        // ═══════════════════════════════════════════════════════════
+        // STEP 5: CALCULATE COST AND CHECK BALANCE
+        // ═══════════════════════════════════════════════════════════
+        
+        // Calculate total cost (price per token × quantity)
         int totalCost = tokenCosts[tokenKey] * quantity;
+        
+        // Get user's current Pouch Egg balance from Streamer.bot loyalty system
         int userBalance = CPH.GetPoints(userId);
         
-        // Check if user has enough Pouch Eggs
+        // Check if user can afford the purchase
         if (userBalance < totalCost)
         {
             CPH.SendMessage($"@{userName}, you need {totalCost} 🥚 but only have {userBalance} 🥚");
             return false;
         }
         
-        // Deduct Pouch Eggs
+        // ═══════════════════════════════════════════════════════════
+        // STEP 6: PROCESS PURCHASE - DEDUCT POUCH EGGS
+        // ═══════════════════════════════════════════════════════════
+        
+        // Remove Pouch Eggs from user's loyalty points
+        // Third parameter is log message for transaction history
         CPH.RemovePoints(userId, totalCost, "Token Purchase");
         
-        // Increment token balance
+        // ═══════════════════════════════════════════════════════════
+        // STEP 7: ADD TOKENS TO USER INVENTORY
+        // ═══════════════════════════════════════════════════════════
+        
+        // Construct variable name: "{userId}_{TokenType}"
+        // Example: "12345678_MysteryEgg"
         string tokenVar = $"{userId}_{tokenKey}";
+        
+        // Get current token count (defaults to 0 if doesn't exist)
+        // persisted: true ensures variable survives Streamer.bot restarts
         int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);
+        
+        // Add purchased quantity to existing tokens
         CPH.SetGlobalVar(tokenVar, currentTokens + quantity, true);
         
-        // Distribute funds (70% to bigNestFund, 20% to jackpot, 10% sink)
-        int bigNestContribution = (int)(totalCost * 0.7);
-        int jackpotContribution = (int)(totalCost * 0.2);
+        // ═══════════════════════════════════════════════════════════
+        // STEP 8: DISTRIBUTE FUNDS TO ECONOMY POOLS
+        // ═══════════════════════════════════════════════════════════
         
+        // Economy fund distribution (percentages):
+        // 70% → bigNestFund (streamer-controlled rewards)
+        // 20% → eggCartonJackpot (jackpot fund)
+        // 10% → Removed from circulation (inflation control)
+        
+        int bigNestContribution = (int)(totalCost * 0.7);    // 70%
+        int jackpotContribution = (int)(totalCost * 0.2);    // 20%
+        // Remaining 10% is implicitly removed (totalCost - 70% - 20% = 10%)
+        
+        // Get current fund values
         int bigNestFund = CPH.GetGlobalVar<int>("bigNestFund", true);
         int eggCartonJackpot = CPH.GetGlobalVar<int>("eggCartonJackpot", true);
         
+        // Add contributions to funds
         CPH.SetGlobalVar("bigNestFund", bigNestFund + bigNestContribution, true);
         CPH.SetGlobalVar("eggCartonJackpot", eggCartonJackpot + jackpotContribution, true);
+        
+        // ═══════════════════════════════════════════════════════════
+        // STEP 9: SEND CONFIRMATION MESSAGE
+        // ═══════════════════════════════════════════════════════════
         
         CPH.SendMessage($"✅ @{userName} purchased {quantity} {tokenKey}(s) for {totalCost} 🥚!");
         
@@ -236,6 +491,29 @@ public class CPHInline
     }
 }
 ```
+
+**Variable Breakdown for This Action:**
+
+| Variable Name | Type | Purpose | Persisted | Example Value |
+|--------------|------|---------|-----------|---------------|
+| `{userId}_MysteryEgg` | int | User's Mystery Egg count | Yes | `3` |
+| `{userId}_DiceEgg` | int | User's Dice Egg count | Yes | `5` |
+| `{userId}_DuelEgg` | int | User's Duel Egg count | Yes | `10` |
+| `bigNestFund` | int | Economy reserve fund | Yes | `1548` |
+| `eggCartonJackpot` | int | Jackpot fund | Yes | `723` |
+
+**Data Flow Example:**
+
+User types: `!buy MysteryEgg 2`
+
+1. ✅ Cost calculated: 2 × 20 = `40 🥚`
+2. ✅ Balance check: User has `100 🥚` (sufficient)
+3. ✅ Deduct: `100 - 40 = 60 🥚` remaining
+4. ✅ Token variable: `12345678_MysteryEgg` increases from `0` to `2`
+5. ✅ bigNestFund: Increases by `28` (70% of 40)
+6. ✅ eggCartonJackpot: Increases by `8` (20% of 40)
+7. ✅ Sink: `4 🥚` removed from economy (10% of 40)
+8. ✅ Confirmation: Message sent to chat
 
    - Click **Compile** (bottom right) - you should see "Compiled Successfully"
    - Click **Save and Compile**

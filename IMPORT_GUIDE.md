@@ -10,25 +10,29 @@ This guide provides the complete, debugged, and ready-to-use Yoshi's Island Eggo
 
 This export includes **everything** you need:
 
-### ✅ 11 Complete Actions
+### ✅ 13 Complete Actions
 1. **[ECON] Buy Token** - Token purchase system
 2. **[GAME] Chomp Tunnel** - Risk-based streak game
 3. **[GAME] Hatch Roll** - D20 luck-based game
-4. **[PVP] Duel Challenge** - Initiate PvP battles
-5. **[PVP] Duel Accept** - Accept PvP challenges
-6. **[PVP] Duel Resolver** - Auto-resolves duels after 10 minutes
-7. **[USER] View Titles** - Show rank progression
-8. **[USER] View Inventory** - Display all tokens and eggs
-9. **[USER] View Character Sheet** - Show game statistics
-10. **[USER] Reset Character** - Reset all stats and tokens
-11. **[MOD] Check Economy Funds** - Monitor economy health
+4. **[GAME] DnD Adventure** - Daily D20 adventures with saving throws
+5. **[PVP] Duel Challenge** - Initiate PvP battles
+6. **[PVP] Duel Accept** - Accept PvP challenges
+7. **[PVP] Duel Resolver** - Auto-resolves duels after 10 minutes
+8. **[USER] View Titles** - Show rank progression
+9. **[USER] View Inventory** - Display all tokens and eggs
+10. **[USER] View Character Sheet** - Show game statistics
+11. **[USER] Reset Character** - Reset all stats and tokens
+12. **[USER] Top Leaderboard** - View top egg holders
+13. **[MOD] Check Economy Funds** - Monitor economy health
 
-### ✅ 10 Chat Commands
+### ✅ 12 Chat Commands
 - `!buy <token> <qty>` - Purchase tokens (5s cooldown)
 - `!chomp` - Play Chomp Tunnel (10s cooldown)
 - `!eggroll` - Play Hatch Roll (10s cooldown)
+- `!adventure` - Play DnD Adventure - once per 24 hours (5s cooldown)
 - `!duelnest @user <wager>` - Challenge to PvP (30s cooldown)
 - `!accept` - Accept duel challenge (5s cooldown)
+- `!top` - View top egg holders (30s cooldown)
 - `!titles` - View rank progression (15s cooldown)
 - `!eggpack` - View full inventory (10s cooldown)
 - `!sheet` - View character stats (10s cooldown)
@@ -48,7 +52,7 @@ This export includes **everything** you need:
 
 ### Method 1: Import from File (Recommended)
 
-1. **Download** the file: `Yoshi_Eggonomy_Complete_v1.0.1.json`
+1. **Download** the file: `Yoshi_Eggonomy_Complete_v1.0.1_FINAL.json`
 2. **Open Streamer.bot**
 3. **Import**: Click `Import` at the top menu (or press `Ctrl+I`)
 4. **Select File**: Browse and select the downloaded JSON file
@@ -57,8 +61,8 @@ This export includes **everything** you need:
 
 ### Method 2: Import from String
 
-1. **Open** the file: `Yoshi_Eggonomy_Complete_Import_String.txt`
-2. **Copy** the entire string (6000+ characters)
+1. **Open** the file: `Yoshi_Eggonomy_Complete_Import_String_FINAL.txt`
+2. **Copy** the entire string (8500+ characters)
 3. **Open Streamer.bot**
 4. **Import**: Click `Import` → `Import from String`
 5. **Paste**: Paste the copied string
@@ -114,12 +118,14 @@ Run these tests before going live:
 ```
 !chomp         → Play Chomp Tunnel (needs 1 Mystery Egg)
 !eggroll       → Play Hatch Roll (needs 1 Dice Egg)
+!adventure     → Play DnD Adventure (needs 500 Pouch Eggs, once per 24 hours)
 ```
 
 **Test User Commands:**
 ```
 !titles        → View your rank
 !sheet         → View your stats
+!top           → View top egg holders
 ```
 
 **Test Moderator Commands:**
@@ -169,6 +175,19 @@ Run these tests before going live:
 - **Payout:** Winner gets their wager + 85% of opponent's
 - **Sink:** 15% goes to bigNestFund
 
+#### DnD Adventure (!adventure)
+- **Cost:** 500 Pouch Eggs
+- **Cooldown:** Once every 24 hours
+- **Mechanic:** Roll D20 for saving throw (STR, DEX, CON, INT, WIS, CHA, or DEATH)
+- **Rewards by Roll:**
+  - 1: Lose 200-300 eggs (critical failure)
+  - 2-5: Lose 50-100 eggs (failure)
+  - 6-10: Gain 100-300 eggs (partial success)
+  - 11-15: Gain 400-600 eggs + 50% chance for 1 token (success)
+  - 16-19: Gain 700-900 eggs + 1 guaranteed token (great success)
+  - 20: Gain 1000-1500 eggs + 2 tokens (critical success)
+- **Scenarios:** 35+ unique scenarios with randomized outcomes
+
 ### Rank System (!titles)
 
 | Rank | Eggs Required | Icon |
@@ -185,6 +204,7 @@ Run these tests before going live:
 - **!eggpack** - View complete inventory (Pouch Eggs + all tokens)
 - **!sheet** - View game statistics (streaks, wins, losses)
 - **!reroll** - Reset character for 1,000 eggs
+- **!top** - View top egg holders leaderboard
 
 ### Economy Management
 - **!econfunds** - Check economy fund balances (moderators only)

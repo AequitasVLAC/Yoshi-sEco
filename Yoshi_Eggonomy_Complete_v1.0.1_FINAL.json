@@ -2,7 +2,7 @@
   "exportVersion": "1.0.0",
   "name": "Yoshi's Island Eggonomy - Complete System",
   "author": "Yoshi's Eggonomy Team",
-  "description": "Complete egg-based economy with tokens, games, PvP battles, and progression system. Includes: Buy tokens, Chomp Tunnel, Hatch Roll, Duel Nest PvP with auto-resolver, rank system, inventory management, and economy monitoring.",
+  "description": "Complete egg-based economy with tokens, games, PvP battles, and progression system. Includes: Buy tokens, Chomp Tunnel, Hatch Roll, Duel Nest PvP with auto-resolver, rank system, inventory management, and economy monitoring. Includes DnD daily adventures and complete leaderboard system.",
   "version": "1.0.1",
   "platform": "streamerbot",
   "platformVersion": "0.2.0+",
@@ -150,6 +150,32 @@
           "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SendMessage($\"💰 Economy Funds | Big Nest: {bigNestFund} 🥚 | Jackpot: {eggCartonJackpot} 🥚\");\n        \n        return true;\n    }\n}"
         }
       ]
+    },
+    {
+      "id": "dnd-adventure",
+      "name": "[GAME] DnD Adventure",
+      "enabled": true,
+      "group": "Games",
+      "subActions": [
+        {
+          "type": "ExecuteCode",
+          "language": "CSharp",
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string cooldownVar = $\"{userId}_adventureLastPlayed\";\n        long lastPlayed = CPH.GetGlobalVar<long>(cooldownVar, true);\n        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();\n        long cooldownSeconds = 86400;\n        \n        if (lastPlayed > 0 && (currentTime - lastPlayed) < cooldownSeconds)\n        {\n            long remainingSeconds = cooldownSeconds - (currentTime - lastPlayed);\n            long hours = remainingSeconds / 3600;\n            long minutes = (remainingSeconds % 3600) / 60;\n            CPH.SendMessage($\"@{userName}, daily adventure ready in {hours}h {minutes}m! 🗡️\");\n            return false;\n        }\n        \n        int currentEggs = CPH.GetPoints(userId);\n        int adventureCost = 500;\n        \n        if (currentEggs < adventureCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {adventureCost} 🥚 for an adventure! You have {currentEggs} 🥚.\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, adventureCost, \"DnD Adventure Entry\");\n        CPH.SetGlobalVar(cooldownVar, currentTime, true);\n        \n        Random rnd = new Random();\n        string[] savingThrows = { \"STR\", \"DEX\", \"CON\", \"INT\", \"WIS\", \"CHA\", \"DEATH\" };\n        string saveType = savingThrows[rnd.Next(savingThrows.Length)];\n        int roll = rnd.Next(1, 21);\n        \n        string scenario = GetScenario(saveType, roll, rnd);\n        int eggReward = 0;\n        int tokenReward = 0;\n        string tokenType = \"\";\n        \n        if (roll == 1)\n        {\n            eggReward = -rnd.Next(200, 301);\n            scenario += $\" Lose {Math.Abs(eggReward)} 🥚!\";\n        }\n        else if (roll <= 5)\n        {\n            eggReward = -rnd.Next(50, 101);\n            scenario += $\" Lose {Math.Abs(eggReward)} 🥚.\";\n        }\n        else if (roll <= 10)\n        {\n            eggReward = rnd.Next(100, 301);\n            scenario += $\" Gain {eggReward} 🥚!\";\n        }\n        else if (roll <= 15)\n        {\n            eggReward = rnd.Next(400, 601);\n            if (rnd.Next(1, 3) == 1)\n            {\n                tokenReward = 1;\n                tokenType = GetRandomToken(rnd);\n            }\n            scenario += tokenReward > 0 ? $\" {eggReward} 🥚 + 1 {tokenType}!\" : $\" {eggReward} 🥚!\";\n        }\n        else if (roll <= 19)\n        {\n            eggReward = rnd.Next(700, 901);\n            tokenReward = 1;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" {eggReward} 🥚 + 1 {tokenType}!\";\n        }\n        else\n        {\n            eggReward = rnd.Next(1000, 1501);\n            tokenReward = 2;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" CRIT! {eggReward} 🥚 + 2 {tokenType}!\";\n        }\n        \n        if (eggReward > 0) CPH.AddPoints(userId, eggReward, \"DnD Adventure Win\");\n        else if (eggReward < 0) CPH.RemovePoints(userId, Math.Abs(eggReward), \"DnD Adventure Loss\");\n        \n        if (tokenReward > 0)\n        {\n            string tokenVar = $\"{userId}_{tokenType}\";\n            int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n            CPH.SetGlobalVar(tokenVar, currentTokens + tokenReward, true);\n        }\n        \n        int totalAdventures = CPH.GetGlobalVar<int>($\"{userId}_totalAdventures\", true);\n        CPH.SetGlobalVar($\"{userId}_totalAdventures\", totalAdventures + 1, true);\n        \n        CPH.SendMessage($\"🎲 @{userName} | {saveType} (Roll: {roll}) | {scenario}\");\n        return true;\n    }\n    \n    private string GetScenario(string saveType, int roll, Random rnd)\n    {\n        string[] scenarios;\n        string base_scenario;\n        \n        switch (saveType)\n        {\n            case \"STR\":\n                scenarios = new string[] { \"A boulder blocks your path!\", \"You must lift a portcullis!\", \"An iron door stands before you!\", \"You wrestle a troll!\", \"A bridge collapses!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Catastrophic fail.\";\n                if (roll <= 5) return base_scenario + \" Can't overcome.\";\n                if (roll <= 10) return base_scenario + \" Barely manage.\";\n                if (roll <= 15) return base_scenario + \" Success!\";\n                if (roll <= 19) return base_scenario + \" Dominate!\";\n                return base_scenario + \" Godly might!\";\n            case \"DEX\":\n                scenarios = new string[] { \"Poison darts!\", \"Floor collapses!\", \"Swinging axes!\", \"Must leap across!\", \"Arrows fly!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Full hit.\";\n                if (roll <= 5) return base_scenario + \" Too slow.\";\n                if (roll <= 10) return base_scenario + \" Narrowly avoid.\";\n                if (roll <= 15) return base_scenario + \" Graceful dodge!\";\n                if (roll <= 19) return base_scenario + \" Acrobatic!\";\n                return base_scenario + \" Impossible backflip!\";\n            case \"CON\":\n                scenarios = new string[] { \"Toxic gas!\", \"Venomous bite!\", \"Cursed water!\", \"Freezing cold!\", \"Disease!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Body fails.\";\n                if (roll <= 5) return base_scenario + \" Suffer badly.\";\n                if (roll <= 10) return base_scenario + \" Weakened.\";\n                if (roll <= 15) return base_scenario + \" Resist!\";\n                if (roll <= 19) return base_scenario + \" Strong!\";\n                return base_scenario + \" Immune!\";\n            case \"INT\":\n                scenarios = new string[] { \"Ancient puzzle!\", \"Cryptic riddle!\", \"Magical trap!\", \"Mysterious tome!\", \"Illusion!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Disaster.\";\n                if (roll <= 5) return base_scenario + \" Can't solve.\";\n                if (roll <= 10) return base_scenario + \" Struggle through.\";\n                if (roll <= 15) return base_scenario + \" Clever!\";\n                if (roll <= 19) return base_scenario + \" Genius!\";\n                return base_scenario + \" Brilliant!\";\n            case \"WIS\":\n                scenarios = new string[] { \"Siren's song!\", \"Mind spores!\", \"Madness whispers!\", \"Hidden danger!\", \"Evil presence!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Succumb.\";\n                if (roll <= 5) return base_scenario + \" Influenced.\";\n                if (roll <= 10) return base_scenario + \" Resist strain.\";\n                if (roll <= 15) return base_scenario + \" See through!\";\n                if (roll <= 19) return base_scenario + \" Fortitude!\";\n                return base_scenario + \" Turn it back!\";\n            case \"CHA\":\n                scenarios = new string[] { \"Hostile bandits!\", \"Dragon demands!\", \"Guards question!\", \"Merchant haggles!\", \"Rival challenges!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Gravely offend.\";\n                if (roll <= 5) return base_scenario + \" Make it worse.\";\n                if (roll <= 10) return base_scenario + \" Barely convince.\";\n                if (roll <= 15) return base_scenario + \" Charm them!\";\n                if (roll <= 19) return base_scenario + \" New allies!\";\n                return base_scenario + \" Legendary!\";\n            case \"DEATH\":\n                scenarios = new string[] { \"On the brink!\", \"Life fades!\", \"Slipping away!\", \"Darkness closes!\", \"Heartbeat slows!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Fail to stabilize.\";\n                if (roll <= 5) return base_scenario + \" Barely conscious.\";\n                if (roll <= 10) return base_scenario + \" Stabilize weakly.\";\n                if (roll <= 15) return base_scenario + \" Recover!\";\n                if (roll <= 19) return base_scenario + \" Spring back!\";\n                return base_scenario + \" Defy death!\";\n            default:\n                return \"Mysterious event.\";\n        }\n    }\n    \n    private string GetRandomToken(Random rnd)\n    {\n        string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\" };\n        return tokens[rnd.Next(tokens.Length)];\n    }\n}"
+        }
+      ]
+    },
+    {
+      "id": "top-leaderboard",
+      "name": "[USER] Top Leaderboard",
+      "enabled": true,
+      "group": "User",
+      "subActions": [
+        {
+          "type": "ExecuteCode",
+          "language": "CSharp",
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        CPH.SendMessage(\"🏆 Top Egg Holders! Check Streamer.bot's loyalty panel or use !eggs to see your balance!\");\n        return true;\n    }\n}"
+        }
+      ]
     }
   ],
   "commands": [
@@ -232,6 +258,22 @@
       "permissions": "Moderators",
       "userCooldown": 30,
       "globalCooldown": 0
+    },
+    {
+      "command": "!adventure",
+      "enabled": true,
+      "action": "dnd-adventure",
+      "permissions": "Everyone",
+      "userCooldown": 5,
+      "globalCooldown": 0
+    },
+    {
+      "command": "!top",
+      "enabled": true,
+      "action": "top-leaderboard",
+      "permissions": "Everyone",
+      "userCooldown": 30,
+      "globalCooldown": 0
     }
   ],
   "globalVariables": [
@@ -276,6 +318,8 @@
     "Duel Nest PvP: Player vs player battles with auto-resolution",
     "Rank System: 7 tiers from Hatchling to Egg Emperor",
     "Currency Sinks: 10% of purchases removed, 15% of duels to economy fund",
-    "Economy Monitoring: Track funds and balance"
+    "Economy Monitoring: Track funds and balance",
+    "DnD Adventure: Daily D20 adventures with 7 saving throw types",
+    "Top Command: View top egg holders"
   ]
 }

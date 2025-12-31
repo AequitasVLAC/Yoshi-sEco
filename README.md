@@ -4,7 +4,13 @@ Welcome to the Yoshi's Island Eggonomy repository! This repository contains comp
 
 ## 🎮 Quick Import Available!
 
-**NEW:** You can now instantly import the DnD Adventure game into Streamer.bot! See **[DnD_Adventure_Import.md](DnD_Adventure_Import.md)** for the one-click import string.
+**🚀 NEW - COMPLETE SYSTEM EXPORT:** You can now import the ENTIRE Yoshi's Island Eggonomy system with one click!
+
+- **📦 [Complete System Export](EXPORT_FILES_README.md)** - Import ALL 13 actions & 12 commands instantly
+- **📖 [Import Guide](IMPORT_GUIDE.md)** - Step-by-step installation for Streamer.bot v1.0.1
+- **🎲 [DnD Adventure Only](DnD_Adventure_Import.md)** - Just the DnD Adventure game
+
+**Includes:** Token economy, 4 games (Chomp Tunnel, Hatch Roll, Duel Nest PvP, DnD Adventure), rank system, leaderboard, and more!
 
 ## What's Inside
 

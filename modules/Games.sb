@@ -1,8 +1,56 @@
 {
-  "Name": "Games",
-  "Description": "Provides mini-games using the Eggonomy virtual currency platform.",
+  "Name": "Yoshi Eggonomy - Games",
+  "Version": "1.0.0",
+  "Description": "Interactive games using egg-based currency and tokens. Includes Roll20 (d20 game with scalable rewards) and Roulette (shot-or-miss with dynamic rewards and risks).",
+  "Platform": "Streamer.bot v0.2.0+",
   "Actions": [
-    {"Name": "PlayDiceGame", "Code": "<Dice Game Logic>"},
-    {"Name": "PlayRPS", "Code": "<Rock-Paper-Scissors Game Logic>"}
-  ]
+    {
+      "Name": "Roll20 Game",
+      "Description": "Roll a d20 for scalable rewards up to 2,000 eggs. Costs 10 eggs per roll.",
+      "Trigger": "!roll20",
+      "Requirements": "10 Pouch Eggs per play",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int entryCost = 10;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < entryCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {entryCost} 🥚 to play Roll20! You have {userBalance} 🥚\");\n            return false;\n        }\n        \n        // Deduct entry cost\n        CPH.RemovePoints(userId, entryCost, \"Roll20 Entry\");\n        \n        // Roll d20\n        Random rnd = new Random();\n        int roll = rnd.Next(1, 21);\n        \n        // Calculate payout based on roll (scalable up to 2000)\n        int payout = 0;\n        string message = \"\";\n        \n        if (roll == 1)\n        {\n            message = $\"💀 @{userName} rolled a {roll}! Critical failure! No reward.\";\n        }\n        else if (roll <= 5)\n        {\n            payout = 10;\n            message = $\"😬 @{userName} rolled a {roll}! Break even. +{payout} 🥚\";\n        }\n        else if (roll <= 10)\n        {\n            payout = 50;\n            message = $\"😊 @{userName} rolled a {roll}! Small win! +{payout} 🥚\";\n        }\n        else if (roll <= 15)\n        {\n            payout = 200;\n            message = $\"🎉 @{userName} rolled a {roll}! Good roll! +{payout} 🥚\";\n        }\n        else if (roll <= 18)\n        {\n            payout = 500;\n            message = $\"🌟 @{userName} rolled a {roll}! Great roll! +{payout} 🥚\";\n        }\n        else if (roll == 19)\n        {\n            payout = 1000;\n            message = $\"💎 @{userName} rolled a {roll}! Amazing roll! +{payout} 🥚\";\n        }\n        else // roll == 20\n        {\n            payout = 2000;\n            message = $\"🏆 @{userName} rolled a NAT 20! JACKPOT! +{payout} 🥚\";\n        }\n        \n        if (payout > 0)\n        {\n            CPH.AddPoints(userId, payout, \"Roll20 Win\");\n        }\n        \n        // Track stats\n        int totalRolls = CPH.GetGlobalVar<int>($\"{userId}_roll20Plays\", true);\n        CPH.SetGlobalVar($\"{userId}_roll20Plays\", totalRolls + 1, true);\n        \n        if (roll == 20)\n        {\n            int nat20Count = CPH.GetGlobalVar<int>($\"{userId}_roll20Nat20s\", true);\n            CPH.SetGlobalVar($\"{userId}_roll20Nat20s\", nat20Count + 1, true);\n        }\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Roulette Game",
+      "Description": "Shot-or-miss challenge with dynamic rewards and risks. Can use RRTokens for protection.",
+      "Trigger": "!roulette",
+      "Requirements": "10 eggs per roll, optional rrtoken for protection",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int entryCost = 10;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < entryCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {entryCost} 🥚 to play Roulette! You have {userBalance} 🥚\");\n            return false;\n        }\n        \n        // Check if user has protection token\n        int rrtokens = CPH.GetGlobalVar<int>($\"{userId}_rrtoken\", true);\n        bool hasProtection = rrtokens > 0;\n        \n        // Deduct entry cost\n        CPH.RemovePoints(userId, entryCost, \"Roulette Entry\");\n        \n        // Spin the roulette (1-6)\n        Random rnd = new Random();\n        int spin = rnd.Next(1, 7);\n        \n        int payout = 0;\n        string message = \"\";\n        \n        if (spin == 1)\n        {\n            // Critical loss\n            if (hasProtection)\n            {\n                // Use protection token\n                CPH.SetGlobalVar($\"{userId}_rrtoken\", rrtokens - 1, true);\n                message = $\"🛡️ @{userName} spun {spin}! RRToken protected you from losing 50 🥚!\";\n            }\n            else\n            {\n                int penalty = 50;\n                CPH.RemovePoints(userId, penalty, \"Roulette Penalty\");\n                message = $\"💥 @{userName} spun {spin}! Bang! Lost {penalty} 🥚! (Use !buy rrtoken 1 for protection)\";\n            }\n        }\n        else if (spin == 2)\n        {\n            message = $\"😰 @{userName} spun {spin}! Click! You survive with nothing.\";\n        }\n        else if (spin == 3)\n        {\n            payout = 20;\n            message = $\"😌 @{userName} spun {spin}! Safe! Small win! +{payout} 🥚\";\n        }\n        else if (spin == 4)\n        {\n            payout = 50;\n            message = $\"😊 @{userName} spun {spin}! Lucky! +{payout} 🥚\";\n        }\n        else if (spin == 5)\n        {\n            payout = 100;\n            message = $\"🎉 @{userName} spun {spin}! Great spin! +{payout} 🥚\";\n        }\n        else // spin == 6\n        {\n            payout = 200;\n            message = $\"🌟 @{userName} spun {spin}! Jackpot spin! +{payout} 🥚\";\n        }\n        \n        if (payout > 0)\n        {\n            CPH.AddPoints(userId, payout, \"Roulette Win\");\n        }\n        \n        // Track stats\n        int totalSpins = CPH.GetGlobalVar<int>($\"{userId}_rouletteSpins\", true);\n        CPH.SetGlobalVar($\"{userId}_rouletteSpins\", totalSpins + 1, true);\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Chomp Tunnel Game",
+      "Description": "Mystery Egg game with streak multipliers. Risk vs reward with Chain Chomp.",
+      "Trigger": "!chomp",
+      "Requirements": "1 Mystery Egg",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        // Check for Mystery Eggs\n        string tokenVar = $\"{userId}_MysteryEgg\";\n        int mysteryEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (mysteryEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Mystery Egg! Use: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        // Deduct Mystery Egg\n        CPH.SetGlobalVar(tokenVar, mysteryEggs - 1, true);\n        \n        // Roll (1-6)\n        Random rnd = new Random();\n        int roll = rnd.Next(1, 7);\n        \n        // Check for Golden Egg (5% chance)\n        bool goldenEgg = rnd.Next(1, 101) <= 5;\n        \n        if (roll == 1)\n        {\n            // Loss - Reset streak\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", 0, true);\n            CPH.SendMessage($\"💀 @{userName} rolled {roll}! Chain Chomp ate your egg! Streak reset.\");\n        }\n        else\n        {\n            // Win - Increase streak\n            int streak = CPH.GetGlobalVar<int>($\"{userId}_chompStreak\", true);\n            streak++;\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", streak, true);\n            \n            // Calculate payout\n            int payout = 10 + (streak * 5);\n            \n            if (goldenEgg)\n            {\n                payout += 100;\n                CPH.AddPoints(userId, payout, \"Chomp Win + Golden\");\n                CPH.SendMessage($\"🌟 @{userName} rolled {roll}! GOLDEN EGG! +{payout} 🥚 | Streak: {streak}\");\n            }\n            else\n            {\n                CPH.AddPoints(userId, payout, \"Chomp Win\");\n                CPH.SendMessage($\"✅ @{userName} rolled {roll}! Safe! +{payout} 🥚 | Streak: {streak}\");\n            }\n        }\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Hatch Roll Game",
+      "Description": "Dice Egg game with d20 roll for tiered rewards",
+      "Trigger": "!eggroll",
+      "Requirements": "1 Dice Egg",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        // Check for Dice Eggs\n        string tokenVar = $\"{userId}_DiceEgg\";\n        int diceEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (diceEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Dice Egg! Use: !buy DiceEgg 1\");\n            return false;\n        }\n        \n        // Deduct Dice Egg\n        CPH.SetGlobalVar(tokenVar, diceEggs - 1, true);\n        \n        // Roll D20\n        Random rnd = new Random();\n        int roll = rnd.Next(1, 21);\n        \n        int payout = 0;\n        string message = \"\";\n        \n        if (roll == 1)\n        {\n            message = $\"💔 @{userName} rolled {roll}! Nothing hatches!\";\n        }\n        else if (roll <= 5)\n        {\n            payout = 5;\n            message = $\"🥚 @{userName} rolled {roll}! Small hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 10)\n        {\n            payout = 15;\n            message = $\"🐣 @{userName} rolled {roll}! Medium hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 15)\n        {\n            payout = 30;\n            message = $\"🐥 @{userName} rolled {roll}! Good hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 18)\n        {\n            payout = 50;\n            message = $\"🌟 @{userName} rolled {roll}! Great hatch! +{payout} 🥚\";\n        }\n        else\n        {\n            payout = 100;\n            message = $\"🎉 @{userName} rolled {roll}! JACKPOT HATCH! +{payout} 🥚\";\n        }\n        \n        if (payout > 0)\n        {\n            CPH.AddPoints(userId, payout, \"Hatch Roll Win\");\n        }\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}"
+      }
+    }
+  ],
+  "Documentation": {
+    "GameCommands": {
+      "Roll20": \"!roll20 - Roll a d20 for rewards up to 2,000 eggs (10 egg entry)\",
+      "Roulette": \"!roulette - Russian roulette style game with risks and rewards (10 egg entry, rrtoken for protection)\",
+      "ChompTunnel": \"!chomp - Risk game with streak multipliers (1 Mystery Egg)\",
+      "HatchRoll": \"!eggroll - D20 hatch game with tiered rewards (1 Dice Egg)\"
+    }
+  }
 }

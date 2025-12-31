@@ -1,9 +1,101 @@
 {
-  "Name": "Currency Setup",
-  "Description": "Handles the virtual currency's base implementation for the Eggonomy system.",
+  "Name": "Yoshi Eggonomy - Currency Setup",
+  "Version": "1.0.0",
+  "Description": "Core currency system for Yoshi Island Eggonomy. Handles Pouch Eggs (main currency) earned through Twitch interactions including watching, chatting, cheering, subs, and raids.",
+  "Platform": "Streamer.bot v0.2.0+",
   "Actions": [
-    {"Name": "InitializeCurrency", "Code": "<Currency Initialization Logic>"},
-    {"Name": "AddCurrency", "Code": "<Logic for Adding Currency>"},
-    {"Name": "CheckBalance", "Code": "<Logic for Checking Balance>"}
-  ]
+    {
+      "Name": "Initialize Currency System",
+      "Description": "Initializes global economy variables for the Eggonomy system. Run this once during initial setup.",
+      "Trigger": "Manual / First-Time Setup",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        // Initialize global economy fund variables\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        if (bigNestFund == 0)\n        {\n            CPH.SetGlobalVar(\"bigNestFund\", 1000, true);\n            CPH.LogInfo(\"Initialized bigNestFund with 1000 eggs\");\n        }\n        \n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        if (eggCartonJackpot == 0)\n        {\n            CPH.SetGlobalVar(\"eggCartonJackpot\", 500, true);\n            CPH.LogInfo(\"Initialized eggCartonJackpot with 500 eggs\");\n        }\n        \n        // Initialize event system variables\n        CPH.SetGlobalVar(\"doubleRewardsActive\", false, true);\n        CPH.SetGlobalVar(\"freeEntryActive\", false, true);\n        \n        CPH.SendMessage(\"✅ Yoshi's Island Eggonomy system initialized! Use !eggs to check your balance.\");\n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Check Balance",
+      "Description": "Displays user's current Pouch Egg balance",
+      "Trigger": "!eggs",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        // Get user's current Pouch Egg balance from loyalty system\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        CPH.SendMessage($\"@{userName} has {pouchEggs} 🥚 Pouch Eggs!\");\n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Award Currency - Cheer",
+      "Description": "Awards eggs for Twitch cheers/bits",
+      "Trigger": "Twitch Cheer Event",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        int bits = int.Parse(args[\"bits\"].ToString());\n        \n        // Award 1 egg per bit\n        int eggReward = bits;\n        \n        CPH.AddPoints(userId, eggReward, \"Cheer Reward\");\n        CPH.SendMessage($\"🎉 Thanks {userName} for {bits} bits! +{eggReward} 🥚!\");\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Award Currency - Sub",
+      "Description": "Awards eggs for subscriptions",
+      "Trigger": "Twitch Sub Event",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        string tier = args.ContainsKey(\"tier\") ? args[\"tier\"].ToString() : \"1\";\n        \n        // Award eggs based on tier\n        int eggReward = 100; // Tier 1\n        if (tier == \"2\") eggReward = 250;\n        if (tier == \"3\") eggReward = 500;\n        \n        CPH.AddPoints(userId, eggReward, \"Subscription Reward\");\n        CPH.SendMessage($\"🌟 Thanks {userName} for subscribing! +{eggReward} 🥚!\");\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Award Currency - Raid",
+      "Description": "Awards eggs to raiding viewers",
+      "Trigger": "Twitch Raid Event",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        int raiders = args.ContainsKey(\"raiders\") ? int.Parse(args[\"raiders\"].ToString()) : 1;\n        \n        // Award 50 eggs to raiding streamer\n        int eggReward = 50;\n        \n        CPH.AddPoints(userId, eggReward, \"Raid Reward\");\n        CPH.SendMessage($\"🎊 Thanks {userName} for the raid with {raiders} viewers! +{eggReward} 🥚!\");\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Economy Funds Check",
+      "Description": "Displays current economy fund balances (Moderator only)",
+      "Trigger": "!econfunds",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SendMessage($\"💰 Economy Funds | Big Nest: {bigNestFund} 🥚 | Jackpot: {eggCartonJackpot} 🥚\");\n        \n        return true;\n    }\n}"
+      }
+    }
+  ],
+  "Setup": {
+    "LoyaltySettings": {
+      "CurrencyName": "Pouch Egg",
+      "CurrencyNamePlural": "Pouch Eggs",
+      "Icon": "🥚",
+      "DefaultCommand": "!eggs",
+      "PassiveIncome": {
+        "OnlineViewers": "5 eggs per 10 minutes",
+        "ActiveChatters": "10 eggs per 10 minutes",
+        "Subscribers": "+5 eggs bonus"
+      }
+    },
+    "GlobalVariables": [
+      {
+        "Name": "bigNestFund",
+        "Type": "int",
+        "InitialValue": 1000,
+        "Description": "Primary economy fund (70% of token purchases)"
+      },
+      {
+        "Name": "eggCartonJackpot",
+        "Type": "int",
+        "InitialValue": 500,
+        "Description": "Jackpot fund (20% of token purchases)"
+      },
+      {
+        "Name": "doubleRewardsActive",
+        "Type": "bool",
+        "InitialValue": false,
+        "Description": "Double rewards event toggle"
+      },
+      {
+        "Name": "freeEntryActive",
+        "Type": "bool",
+        "InitialValue": false,
+        "Description": "Free entry event toggle"
+      }
+    ]
+  }
 }

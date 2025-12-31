@@ -2,20 +2,7 @@
 
 Welcome to the Yoshi's Island Eggonomy repository! This repository contains comprehensive documentation for building an interactive and engaging egg-based economy system using Streamer.bot.
 
-## 🎮 Quick Import Available!
 
-**🎉 IMPORT FIXED - December 31, 2025!** All export files now work perfectly with Streamer.bot v1.0.1!
-
-**🚀 NEW - COMPLETE SYSTEM EXPORT:** You can now import the ENTIRE Yoshi's Island Eggonomy system with one click!
-
-- **📦 [Complete System Export](EXPORT_FILES_README.md)** - Import ALL 13 actions & 12 commands instantly
-- **✅ [UUEncoder Validation Report](UUENCODER_VALIDATION_REPORT.md)** - Technical validation of export formats
-- **🧪 [Testing Guide](TESTING_GUIDE.md)** - Manual testing procedures for Streamer.bot v1.0.1
-- **🔧 [Import Fixed!](IMPORT_FIX_ANNOUNCEMENT.md)** - What was fixed and how to use the corrected files
-- **📖 [Import Guide](IMPORT_GUIDE.md)** - Step-by-step installation for Streamer.bot v1.0.1
-- **🎲 [DnD Adventure Only](DnD_Adventure_Import.md)** - Just the DnD Adventure game
-
-**Includes:** Token economy, 4 games (Chomp Tunnel, Hatch Roll, Duel Nest PvP, DnD Adventure), rank system, leaderboard, and more!
 
 ## What's Inside
 
@@ -248,14 +235,6 @@ This economy runs 100% inside Streamer.bot with no external dependencies:
 6. **DnD_Adventure_Guide.md** - D&D-style daily adventure game (29KB)
 7. **Troubleshooting_Guide.md** - Solutions and best practices (23KB)
 
-### Import Files & Validation
-1. **Yoshi_Eggonomy_Complete_v1.0.1_FINAL.json** - Complete system export (40KB)
-2. **Yoshi_Eggonomy_Complete_Import_String_FINAL.txt** - Import string (8.6KB)
-3. **IMPORT_GUIDE.md** - Step-by-step import instructions
-4. **UUENCODER_VALIDATION_REPORT.md** - Technical validation report
-5. **TESTING_GUIDE.md** - Manual testing procedures (45 min)
-6. **validate_export.py** - Automated validation script
-
 ### Total Content
 - **180+ pages** of documentation
 - **35+ code examples** ready to copy/paste
@@ -263,7 +242,6 @@ This economy runs 100% inside Streamer.bot with no external dependencies:
 - **180+ variables** fully explained
 - **50+ common issues** with solutions
 - **20+ customization templates**
-- **Validated export files** ready for one-click import
 
 ## Community & Support
 

@@ -15,6 +15,12 @@ import gzip
 import sys
 from pathlib import Path
 
+# Streamer.bot type constants
+TYPE_EXPORT = 'Streamer.bot.Data.Export, Streamer.bot'
+TYPE_ACTION = 'Streamer.bot.Data.Action, Streamer.bot'
+TYPE_COMMAND = 'Streamer.bot.Data.Command, Streamer.bot'
+TYPE_TIMED_ACTION = 'Streamer.bot.Data.TimedAction, Streamer.bot'
+
 
 def validate_streamerbot_export(json_data):
     """Validate that the JSON matches Streamer.bot v1.0.1 export format"""
@@ -24,7 +30,7 @@ def validate_streamerbot_export(json_data):
     # Root level validation
     if '$type' not in json_data:
         issues.append("Missing root $type field")
-    elif json_data['$type'] != 'Streamer.bot.Data.Export, Streamer.bot':
+    elif json_data['$type'] != TYPE_EXPORT:
         issues.append(f"Incorrect root $type: {json_data['$type']}")
     
     # Required root fields
@@ -40,7 +46,7 @@ def validate_streamerbot_export(json_data):
             
             if '$type' not in action:
                 issues.append(f"{action_name}: Missing $type")
-            elif action['$type'] != 'Streamer.bot.Data.Action, Streamer.bot':
+            elif action['$type'] != TYPE_ACTION:
                 issues.append(f"{action_name}: Incorrect $type: {action['$type']}")
             
             required_action_fields = ['id', 'name', 'enabled', 'group']
@@ -70,7 +76,7 @@ def validate_streamerbot_export(json_data):
             
             if '$type' not in command:
                 issues.append(f"{cmd_name}: Missing $type")
-            elif command['$type'] != 'Streamer.bot.Data.Command, Streamer.bot':
+            elif command['$type'] != TYPE_COMMAND:
                 issues.append(f"{cmd_name}: Incorrect $type: {command['$type']}")
             
             required_cmd_fields = ['id', 'name', 'enabled', 'actionId']
@@ -90,7 +96,7 @@ def validate_streamerbot_export(json_data):
             
             if '$type' not in timed:
                 issues.append(f"{timed_name}: Missing $type")
-            elif timed['$type'] != 'Streamer.bot.Data.TimedAction, Streamer.bot':
+            elif timed['$type'] != TYPE_TIMED_ACTION:
                 issues.append(f"{timed_name}: Incorrect $type")
             
             if 'actionId' not in timed:

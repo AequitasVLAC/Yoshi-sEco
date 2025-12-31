@@ -1,281 +1,552 @@
 {
-  "exportVersion": "1.0.0",
-  "name": "Yoshi's Island Eggonomy - Complete System",
-  "author": "Yoshi's Eggonomy Team",
-  "description": "Complete egg-based economy with tokens, games, PvP battles, and progression system. Includes: Buy tokens, Chomp Tunnel, Hatch Roll, Duel Nest PvP with auto-resolver, rank system, inventory management, and economy monitoring. Includes DnD daily adventures and complete leaderboard system.",
+  "$type": "Streamer.bot.Data.Export, Streamer.bot",
   "version": "1.0.1",
-  "platform": "streamerbot",
-  "platformVersion": "1.0.1",
-  "createdAt": "2025-12-30T23:45:05.394008",
+  "exportedAt": "2025-12-31T00:15:15.837499Z",
   "actions": [
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "buy-token",
       "name": "[ECON] Buy Token",
       "enabled": true,
       "group": "Economy",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        string tokenType = args[\"rawInput0\"]?.ToString(); \n        \n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int quantity) || quantity < 1)\n        {\n            CPH.SendMessage($\"@{userName}, please specify a valid quantity! Example: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        Dictionary<string, int> tokenCosts = new Dictionary<string, int>\n        {\n            {\"MysteryEgg\", 20},\n            {\"DiceEgg\", 10},\n            {\"DuelEgg\", 5}\n        };\n        \n        string tokenKey = null;\n        foreach (var key in tokenCosts.Keys)\n        {\n            if (key.Equals(tokenType, StringComparison.OrdinalIgnoreCase))\n            {\n                tokenKey = key;\n                break;\n            }\n        }\n        \n        if (tokenKey == null)\n        {\n            CPH.SendMessage($\"@{userName}, invalid token type! Use: MysteryEgg, DiceEgg, or DuelEgg\");\n            return false;\n        }\n        \n        int totalCost = tokenCosts[tokenKey] * quantity;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < totalCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {totalCost} 🥚 but only have {userBalance} 🥚\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, totalCost, \"Token Purchase\");\n        \n        string tokenVar = $\"{userId}_{tokenKey}\";\n        int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n        CPH.SetGlobalVar(tokenVar, currentTokens + quantity, true);\n        \n        int bigNestContribution = (int)(totalCost * 0.7);\n        int jackpotContribution = (int)(totalCost * 0.2);\n        \n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + bigNestContribution, true);\n        CPH.SetGlobalVar(\"eggCartonJackpot\", eggCartonJackpot + jackpotContribution, true);\n        \n        CPH.SendMessage($\"✅ @{userName} purchased {quantity} {tokenKey}(s) for {totalCost} 🥚!\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        string tokenType = args[\"rawInput0\"]?.ToString(); \n        \n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int quantity) || quantity < 1)\n        {\n            CPH.SendMessage($\"@{userName}, please specify a valid quantity! Example: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        Dictionary<string, int> tokenCosts = new Dictionary<string, int>\n        {\n            {\"MysteryEgg\", 20},\n            {\"DiceEgg\", 10},\n            {\"DuelEgg\", 5}\n        };\n        \n        string tokenKey = null;\n        foreach (var key in tokenCosts.Keys)\n        {\n            if (key.Equals(tokenType, StringComparison.OrdinalIgnoreCase))\n            {\n                tokenKey = key;\n                break;\n            }\n        }\n        \n        if (tokenKey == null)\n        {\n            CPH.SendMessage($\"@{userName}, invalid token type! Use: MysteryEgg, DiceEgg, or DuelEgg\");\n            return false;\n        }\n        \n        int totalCost = tokenCosts[tokenKey] * quantity;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < totalCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {totalCost} \ud83e\udd5a but only have {userBalance} \ud83e\udd5a\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, totalCost, \"Token Purchase\");\n        \n        string tokenVar = $\"{userId}_{tokenKey}\";\n        int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n        CPH.SetGlobalVar(tokenVar, currentTokens + quantity, true);\n        \n        int bigNestContribution = (int)(totalCost * 0.7);\n        int jackpotContribution = (int)(totalCost * 0.2);\n        \n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + bigNestContribution, true);\n        CPH.SetGlobalVar(\"eggCartonJackpot\", eggCartonJackpot + jackpotContribution, true);\n        \n        CPH.SendMessage($\"\u2705 @{userName} purchased {quantity} {tokenKey}(s) for {totalCost} \ud83e\udd5a!\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "chomp-tunnel",
       "name": "[GAME] Chomp Tunnel",
       "enabled": true,
       "group": "Games",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string tokenVar = $\"{userId}_MysteryEgg\";\n        int mysteryEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (mysteryEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Mystery Egg! Use: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(tokenVar, mysteryEggs - 1, true);\n        \n        Random rnd = new Random();\n        int roll = rnd.Next(1, 7);\n        bool goldenEgg = rnd.Next(1, 101) <= 5;\n        \n        if (roll == 1)\n        {\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", 0, true);\n            CPH.SendMessage($\"💀 @{userName} rolled {roll}! Chain Chomp ate your egg! Streak reset.\");\n        }\n        else\n        {\n            int streak = CPH.GetGlobalVar<int>($\"{userId}_chompStreak\", true);\n            streak++;\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", streak, true);\n            \n            int chompWins = CPH.GetGlobalVar<int>($\"{userId}_chompWins\", true);\n            CPH.SetGlobalVar($\"{userId}_chompWins\", chompWins + 1, true);\n            \n            int payout = 10 + (streak * 5);\n            \n            if (goldenEgg)\n            {\n                payout += 100;\n                CPH.AddPoints(userId, payout, \"Chomp Win + Golden Egg\");\n                CPH.SendMessage($\"🌟 @{userName} rolled {roll}! GOLDEN EGG! +{payout} 🥚 | Streak: {streak}\");\n            }\n            else\n            {\n                CPH.AddPoints(userId, payout, \"Chomp Win\");\n                CPH.SendMessage($\"✅ @{userName} rolled {roll}! Safe! +{payout} 🥚 | Streak: {streak}\");\n            }\n        }\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string tokenVar = $\"{userId}_MysteryEgg\";\n        int mysteryEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (mysteryEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Mystery Egg! Use: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(tokenVar, mysteryEggs - 1, true);\n        \n        Random rnd = new Random();\n        int roll = rnd.Next(1, 7);\n        bool goldenEgg = rnd.Next(1, 101) <= 5;\n        \n        if (roll == 1)\n        {\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", 0, true);\n            CPH.SendMessage($\"\ud83d\udc80 @{userName} rolled {roll}! Chain Chomp ate your egg! Streak reset.\");\n        }\n        else\n        {\n            int streak = CPH.GetGlobalVar<int>($\"{userId}_chompStreak\", true);\n            streak++;\n            CPH.SetGlobalVar($\"{userId}_chompStreak\", streak, true);\n            \n            int chompWins = CPH.GetGlobalVar<int>($\"{userId}_chompWins\", true);\n            CPH.SetGlobalVar($\"{userId}_chompWins\", chompWins + 1, true);\n            \n            int payout = 10 + (streak * 5);\n            \n            if (goldenEgg)\n            {\n                payout += 100;\n                CPH.AddPoints(userId, payout, \"Chomp Win + Golden Egg\");\n                CPH.SendMessage($\"\ud83c\udf1f @{userName} rolled {roll}! GOLDEN EGG! +{payout} \ud83e\udd5a | Streak: {streak}\");\n            }\n            else\n            {\n                CPH.AddPoints(userId, payout, \"Chomp Win\");\n                CPH.SendMessage($\"\u2705 @{userName} rolled {roll}! Safe! +{payout} \ud83e\udd5a | Streak: {streak}\");\n            }\n        }\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "hatch-roll",
       "name": "[GAME] Hatch Roll",
       "enabled": true,
       "group": "Games",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string tokenVar = $\"{userId}_DiceEgg\";\n        int diceEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (diceEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Dice Egg! Use: !buy DiceEgg 1\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(tokenVar, diceEggs - 1, true);\n        \n        int eggrollPlays = CPH.GetGlobalVar<int>($\"{userId}_eggrollPlays\", true);\n        CPH.SetGlobalVar($\"{userId}_eggrollPlays\", eggrollPlays + 1, true);\n        \n        Random rnd = new Random();\n        int roll = rnd.Next(1, 21);\n        \n        int payout = 0;\n        string message = \"\";\n        \n        if (roll == 1)\n        {\n            message = $\"💔 @{userName} rolled {roll}! Your egg hatched into nothing!\";\n        }\n        else if (roll <= 5)\n        {\n            payout = 5;\n            message = $\"🥚 @{userName} rolled {roll}! Small hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 10)\n        {\n            payout = 15;\n            message = $\"🐣 @{userName} rolled {roll}! Medium hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 15)\n        {\n            payout = 30;\n            message = $\"🐥 @{userName} rolled {roll}! Good hatch! +{payout} 🥚\";\n        }\n        else if (roll <= 18)\n        {\n            payout = 50;\n            message = $\"🌟 @{userName} rolled {roll}! Great hatch! +{payout} 🥚\";\n        }\n        else\n        {\n            payout = 100;\n            message = $\"🎉 @{userName} rolled {roll}! JACKPOT HATCH! +{payout} 🥚\";\n        }\n        \n        if (payout > 0)\n        {\n            CPH.AddPoints(userId, payout, \"Hatch Roll Win\");\n        }\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string tokenVar = $\"{userId}_DiceEgg\";\n        int diceEggs = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (diceEggs < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 Dice Egg! Use: !buy DiceEgg 1\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(tokenVar, diceEggs - 1, true);\n        \n        int eggrollPlays = CPH.GetGlobalVar<int>($\"{userId}_eggrollPlays\", true);\n        CPH.SetGlobalVar($\"{userId}_eggrollPlays\", eggrollPlays + 1, true);\n        \n        Random rnd = new Random();\n        int roll = rnd.Next(1, 21);\n        \n        int payout = 0;\n        string message = \"\";\n        \n        if (roll == 1)\n        {\n            message = $\"\ud83d\udc94 @{userName} rolled {roll}! Your egg hatched into nothing!\";\n        }\n        else if (roll <= 5)\n        {\n            payout = 5;\n            message = $\"\ud83e\udd5a @{userName} rolled {roll}! Small hatch! +{payout} \ud83e\udd5a\";\n        }\n        else if (roll <= 10)\n        {\n            payout = 15;\n            message = $\"\ud83d\udc23 @{userName} rolled {roll}! Medium hatch! +{payout} \ud83e\udd5a\";\n        }\n        else if (roll <= 15)\n        {\n            payout = 30;\n            message = $\"\ud83d\udc25 @{userName} rolled {roll}! Good hatch! +{payout} \ud83e\udd5a\";\n        }\n        else if (roll <= 18)\n        {\n            payout = 50;\n            message = $\"\ud83c\udf1f @{userName} rolled {roll}! Great hatch! +{payout} \ud83e\udd5a\";\n        }\n        else\n        {\n            payout = 100;\n            message = $\"\ud83c\udf89 @{userName} rolled {roll}! JACKPOT HATCH! +{payout} \ud83e\udd5a\";\n        }\n        \n        if (payout > 0)\n        {\n            CPH.AddPoints(userId, payout, \"Hatch Roll Win\");\n        }\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "duel-challenge",
       "name": "[PVP] Duel Challenge",
       "enabled": true,
       "group": "PVP",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string challengerId = args[\"userId\"].ToString();\n        string challengerName = args[\"userName\"].ToString();\n        string opponentName = args[\"rawInput0\"]?.ToString()?.TrimStart('@');\n        \n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int wager) || wager < 1)\n        {\n            CPH.SendMessage($\"@{challengerName}, usage: !duelnest @username <wager>\");\n            return false;\n        }\n        \n        if (string.IsNullOrEmpty(opponentName))\n        {\n            CPH.SendMessage($\"@{challengerName}, please specify an opponent!\");\n            return false;\n        }\n        \n        string challengerTokenVar = $\"{challengerId}_DuelEgg\";\n        int challengerDuelEggs = CPH.GetGlobalVar<int>(challengerTokenVar, true);\n        \n        if (challengerDuelEggs < 1)\n        {\n            CPH.SendMessage($\"@{challengerName}, you need 1 Duel Egg! Use: !buy DuelEgg 1\");\n            return false;\n        }\n        \n        int challengerBalance = CPH.GetPoints(challengerId);\n        if (challengerBalance < wager)\n        {\n            CPH.SendMessage($\"@{challengerName}, you need {wager} 🥚 but have {challengerBalance} 🥚\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(\"duel_challenger\", challengerId, true);\n        CPH.SetGlobalVar(\"duel_challengerName\", challengerName, true);\n        CPH.SetGlobalVar(\"duel_opponentName\", opponentName, true);\n        CPH.SetGlobalVar(\"duel_wager\", wager, true);\n        CPH.SetGlobalVar(\"duel_timestamp\", DateTime.Now.Ticks, true);\n        \n        CPH.SendMessage($\"⚔️ @{opponentName}, {challengerName} challenges you to Duel Nest for {wager} 🥚! Type !accept within 2 minutes!\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string challengerId = args[\"userId\"].ToString();\n        string challengerName = args[\"userName\"].ToString();\n        string opponentName = args[\"rawInput0\"]?.ToString()?.TrimStart('@');\n        \n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int wager) || wager < 1)\n        {\n            CPH.SendMessage($\"@{challengerName}, usage: !duelnest @username <wager>\");\n            return false;\n        }\n        \n        if (string.IsNullOrEmpty(opponentName))\n        {\n            CPH.SendMessage($\"@{challengerName}, please specify an opponent!\");\n            return false;\n        }\n        \n        string challengerTokenVar = $\"{challengerId}_DuelEgg\";\n        int challengerDuelEggs = CPH.GetGlobalVar<int>(challengerTokenVar, true);\n        \n        if (challengerDuelEggs < 1)\n        {\n            CPH.SendMessage($\"@{challengerName}, you need 1 Duel Egg! Use: !buy DuelEgg 1\");\n            return false;\n        }\n        \n        int challengerBalance = CPH.GetPoints(challengerId);\n        if (challengerBalance < wager)\n        {\n            CPH.SendMessage($\"@{challengerName}, you need {wager} \ud83e\udd5a but have {challengerBalance} \ud83e\udd5a\");\n            return false;\n        }\n        \n        CPH.SetGlobalVar(\"duel_challenger\", challengerId, true);\n        CPH.SetGlobalVar(\"duel_challengerName\", challengerName, true);\n        CPH.SetGlobalVar(\"duel_opponentName\", opponentName, true);\n        CPH.SetGlobalVar(\"duel_wager\", wager, true);\n        CPH.SetGlobalVar(\"duel_timestamp\", DateTime.Now.Ticks, true);\n        \n        CPH.SendMessage($\"\u2694\ufe0f @{opponentName}, {challengerName} challenges you to Duel Nest for {wager} \ud83e\udd5a! Type !accept within 2 minutes!\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "duel-accept",
       "name": "[PVP] Duel Accept",
       "enabled": true,
       "group": "PVP",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string accepterId = args[\"userId\"].ToString();\n        string accepterName = args[\"userName\"].ToString();\n        \n        string opponentName = CPH.GetGlobalVar<string>(\"duel_opponentName\", true);\n        \n        if (opponentName == null || !opponentName.Equals(accepterName, StringComparison.OrdinalIgnoreCase))\n        {\n            CPH.SendMessage($\"@{accepterName}, no active duel challenge for you!\");\n            return false;\n        }\n        \n        long challengeTime = CPH.GetGlobalVar<long>(\"duel_timestamp\", true);\n        TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - challengeTime);\n        \n        if (elapsed.TotalMinutes > 2)\n        {\n            CPH.SendMessage($\"@{accepterName}, the challenge expired!\");\n            CPH.UnsetGlobalVar(\"duel_challenger\", true);\n            CPH.UnsetGlobalVar(\"duel_challengerName\", true);\n            CPH.UnsetGlobalVar(\"duel_opponentName\", true);\n            CPH.UnsetGlobalVar(\"duel_wager\", true);\n            CPH.UnsetGlobalVar(\"duel_timestamp\", true);\n            return false;\n        }\n        \n        string challengerId = CPH.GetGlobalVar<string>(\"duel_challenger\", true);\n        string challengerName = CPH.GetGlobalVar<string>(\"duel_challengerName\", true);\n        int wager = CPH.GetGlobalVar<int>(\"duel_wager\", true);\n        \n        string accepterTokenVar = $\"{accepterId}_DuelEgg\";\n        int accepterDuelEggs = CPH.GetGlobalVar<int>(accepterTokenVar, true);\n        \n        if (accepterDuelEggs < 1)\n        {\n            CPH.SendMessage($\"@{accepterName}, you need 1 Duel Egg! Use: !buy DuelEgg 1\");\n            return false;\n        }\n        \n        int accepterBalance = CPH.GetPoints(accepterId);\n        if (accepterBalance < wager)\n        {\n            CPH.SendMessage($\"@{accepterName}, you need {wager} 🥚 but have {accepterBalance} 🥚\");\n            return false;\n        }\n        \n        string challengerTokenVar = $\"{challengerId}_DuelEgg\";\n        int challengerDuelEggs = CPH.GetGlobalVar<int>(challengerTokenVar, true);\n        CPH.SetGlobalVar(challengerTokenVar, challengerDuelEggs - 1, true);\n        CPH.SetGlobalVar(accepterTokenVar, accepterDuelEggs - 1, true);\n        \n        CPH.SetGlobalVar(\"activeDuel_challenger\", challengerId, true);\n        CPH.SetGlobalVar(\"activeDuel_challengerName\", challengerName, true);\n        CPH.SetGlobalVar(\"activeDuel_accepter\", accepterId, true);\n        CPH.SetGlobalVar(\"activeDuel_accepterName\", accepterName, true);\n        CPH.SetGlobalVar(\"activeDuel_wager\", wager, true);\n        CPH.SetGlobalVar(\"activeDuel_startTime\", DateTime.Now.Ticks, true);\n        \n        CPH.SendMessage($\"⚔️ DUEL ACCEPTED! {challengerName} vs {accepterName} for {wager} 🥚! Auto-resolves in 10 minutes!\");\n        \n        CPH.UnsetGlobalVar(\"duel_challenger\", true);\n        CPH.UnsetGlobalVar(\"duel_challengerName\", true);\n        CPH.UnsetGlobalVar(\"duel_opponentName\", true);\n        CPH.UnsetGlobalVar(\"duel_wager\", true);\n        CPH.UnsetGlobalVar(\"duel_timestamp\", true);\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string accepterId = args[\"userId\"].ToString();\n        string accepterName = args[\"userName\"].ToString();\n        \n        string opponentName = CPH.GetGlobalVar<string>(\"duel_opponentName\", true);\n        \n        if (opponentName == null || !opponentName.Equals(accepterName, StringComparison.OrdinalIgnoreCase))\n        {\n            CPH.SendMessage($\"@{accepterName}, no active duel challenge for you!\");\n            return false;\n        }\n        \n        long challengeTime = CPH.GetGlobalVar<long>(\"duel_timestamp\", true);\n        TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - challengeTime);\n        \n        if (elapsed.TotalMinutes > 2)\n        {\n            CPH.SendMessage($\"@{accepterName}, the challenge expired!\");\n            CPH.UnsetGlobalVar(\"duel_challenger\", true);\n            CPH.UnsetGlobalVar(\"duel_challengerName\", true);\n            CPH.UnsetGlobalVar(\"duel_opponentName\", true);\n            CPH.UnsetGlobalVar(\"duel_wager\", true);\n            CPH.UnsetGlobalVar(\"duel_timestamp\", true);\n            return false;\n        }\n        \n        string challengerId = CPH.GetGlobalVar<string>(\"duel_challenger\", true);\n        string challengerName = CPH.GetGlobalVar<string>(\"duel_challengerName\", true);\n        int wager = CPH.GetGlobalVar<int>(\"duel_wager\", true);\n        \n        string accepterTokenVar = $\"{accepterId}_DuelEgg\";\n        int accepterDuelEggs = CPH.GetGlobalVar<int>(accepterTokenVar, true);\n        \n        if (accepterDuelEggs < 1)\n        {\n            CPH.SendMessage($\"@{accepterName}, you need 1 Duel Egg! Use: !buy DuelEgg 1\");\n            return false;\n        }\n        \n        int accepterBalance = CPH.GetPoints(accepterId);\n        if (accepterBalance < wager)\n        {\n            CPH.SendMessage($\"@{accepterName}, you need {wager} \ud83e\udd5a but have {accepterBalance} \ud83e\udd5a\");\n            return false;\n        }\n        \n        string challengerTokenVar = $\"{challengerId}_DuelEgg\";\n        int challengerDuelEggs = CPH.GetGlobalVar<int>(challengerTokenVar, true);\n        CPH.SetGlobalVar(challengerTokenVar, challengerDuelEggs - 1, true);\n        CPH.SetGlobalVar(accepterTokenVar, accepterDuelEggs - 1, true);\n        \n        CPH.SetGlobalVar(\"activeDuel_challenger\", challengerId, true);\n        CPH.SetGlobalVar(\"activeDuel_challengerName\", challengerName, true);\n        CPH.SetGlobalVar(\"activeDuel_accepter\", accepterId, true);\n        CPH.SetGlobalVar(\"activeDuel_accepterName\", accepterName, true);\n        CPH.SetGlobalVar(\"activeDuel_wager\", wager, true);\n        CPH.SetGlobalVar(\"activeDuel_startTime\", DateTime.Now.Ticks, true);\n        \n        CPH.SendMessage($\"\u2694\ufe0f DUEL ACCEPTED! {challengerName} vs {accepterName} for {wager} \ud83e\udd5a! Auto-resolves in 10 minutes!\");\n        \n        CPH.UnsetGlobalVar(\"duel_challenger\", true);\n        CPH.UnsetGlobalVar(\"duel_challengerName\", true);\n        CPH.UnsetGlobalVar(\"duel_opponentName\", true);\n        CPH.UnsetGlobalVar(\"duel_wager\", true);\n        CPH.UnsetGlobalVar(\"duel_timestamp\", true);\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "duel-resolver",
       "name": "[PVP] Duel Resolver",
       "enabled": true,
       "group": "PVP",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string challengerId = CPH.GetGlobalVar<string>(\"activeDuel_challenger\", true);\n        if (string.IsNullOrEmpty(challengerId))\n        {\n            return false;\n        }\n        \n        long startTime = CPH.GetGlobalVar<long>(\"activeDuel_startTime\", true);\n        TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - startTime);\n        \n        if (elapsed.TotalMinutes < 10)\n        {\n            return false;\n        }\n        \n        string challengerName = CPH.GetGlobalVar<string>(\"activeDuel_challengerName\", true);\n        string accepterId = CPH.GetGlobalVar<string>(\"activeDuel_accepter\", true);\n        string accepterName = CPH.GetGlobalVar<string>(\"activeDuel_accepterName\", true);\n        int wager = CPH.GetGlobalVar<int>(\"activeDuel_wager\", true);\n        \n        Random rnd = new Random();\n        int challengerRoll = rnd.Next(1, 101);\n        int accepterRoll = rnd.Next(1, 101);\n        \n        string winner, loser, winnerId, loserId;\n        int winnerRoll, loserRoll;\n        \n        if (challengerRoll > accepterRoll)\n        {\n            winner = challengerName;\n            winnerId = challengerId;\n            loser = accepterName;\n            loserId = accepterId;\n            winnerRoll = challengerRoll;\n            loserRoll = accepterRoll;\n        }\n        else\n        {\n            winner = accepterName;\n            winnerId = accepterId;\n            loser = challengerName;\n            loserId = challengerId;\n            winnerRoll = accepterRoll;\n            loserRoll = challengerRoll;\n        }\n        \n        int totalPot = wager * 2;\n        int winnerPayout = (int)(wager + (wager * 0.85));\n        int sinkAmount = totalPot - winnerPayout;\n        \n        CPH.RemovePoints(challengerId, wager, \"Duel Wager\");\n        CPH.RemovePoints(accepterId, wager, \"Duel Wager\");\n        CPH.AddPoints(winnerId, winnerPayout, \"Duel Win\");\n        \n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + sinkAmount, true);\n        \n        int winnerDuelWins = CPH.GetGlobalVar<int>($\"{winnerId}_duelWins\", true);\n        int loserDuelLosses = CPH.GetGlobalVar<int>($\"{loserId}_duelLosses\", true);\n        CPH.SetGlobalVar($\"{winnerId}_duelWins\", winnerDuelWins + 1, true);\n        CPH.SetGlobalVar($\"{loserId}_duelLosses\", loserDuelLosses + 1, true);\n        \n        CPH.SendMessage($\"⚔️ DUEL RESULT: {winner} ({winnerRoll}) defeats {loser} ({loserRoll})! {winner} wins {winnerPayout} 🥚!\");\n        \n        CPH.UnsetGlobalVar(\"activeDuel_challenger\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_challengerName\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_accepter\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_accepterName\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_wager\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_startTime\", true);\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string challengerId = CPH.GetGlobalVar<string>(\"activeDuel_challenger\", true);\n        if (string.IsNullOrEmpty(challengerId))\n        {\n            return false;\n        }\n        \n        long startTime = CPH.GetGlobalVar<long>(\"activeDuel_startTime\", true);\n        TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - startTime);\n        \n        if (elapsed.TotalMinutes < 10)\n        {\n            return false;\n        }\n        \n        string challengerName = CPH.GetGlobalVar<string>(\"activeDuel_challengerName\", true);\n        string accepterId = CPH.GetGlobalVar<string>(\"activeDuel_accepter\", true);\n        string accepterName = CPH.GetGlobalVar<string>(\"activeDuel_accepterName\", true);\n        int wager = CPH.GetGlobalVar<int>(\"activeDuel_wager\", true);\n        \n        Random rnd = new Random();\n        int challengerRoll = rnd.Next(1, 101);\n        int accepterRoll = rnd.Next(1, 101);\n        \n        string winner, loser, winnerId, loserId;\n        int winnerRoll, loserRoll;\n        \n        if (challengerRoll > accepterRoll)\n        {\n            winner = challengerName;\n            winnerId = challengerId;\n            loser = accepterName;\n            loserId = accepterId;\n            winnerRoll = challengerRoll;\n            loserRoll = accepterRoll;\n        }\n        else\n        {\n            winner = accepterName;\n            winnerId = accepterId;\n            loser = challengerName;\n            loserId = challengerId;\n            winnerRoll = accepterRoll;\n            loserRoll = challengerRoll;\n        }\n        \n        int totalPot = wager * 2;\n        int winnerPayout = (int)(wager + (wager * 0.85));\n        int sinkAmount = totalPot - winnerPayout;\n        \n        CPH.RemovePoints(challengerId, wager, \"Duel Wager\");\n        CPH.RemovePoints(accepterId, wager, \"Duel Wager\");\n        CPH.AddPoints(winnerId, winnerPayout, \"Duel Win\");\n        \n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + sinkAmount, true);\n        \n        int winnerDuelWins = CPH.GetGlobalVar<int>($\"{winnerId}_duelWins\", true);\n        int loserDuelLosses = CPH.GetGlobalVar<int>($\"{loserId}_duelLosses\", true);\n        CPH.SetGlobalVar($\"{winnerId}_duelWins\", winnerDuelWins + 1, true);\n        CPH.SetGlobalVar($\"{loserId}_duelLosses\", loserDuelLosses + 1, true);\n        \n        CPH.SendMessage($\"\u2694\ufe0f DUEL RESULT: {winner} ({winnerRoll}) defeats {loser} ({loserRoll})! {winner} wins {winnerPayout} \ud83e\udd5a!\");\n        \n        CPH.UnsetGlobalVar(\"activeDuel_challenger\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_challengerName\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_accepter\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_accepterName\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_wager\", true);\n        CPH.UnsetGlobalVar(\"activeDuel_startTime\", true);\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "view-titles",
       "name": "[USER] View Titles",
       "enabled": true,
       "group": "User",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        string rank = \"\", icon = \"\", nextRank = \"\";\n        int nextThreshold = 0;\n        \n        if (pouchEggs < 100) { rank = \"Hatchling\"; icon = \"🥚\"; nextRank = \"Egg Runner\"; nextThreshold = 100; }\n        else if (pouchEggs < 500) { rank = \"Egg Runner\"; icon = \"🏃\"; nextRank = \"Nest Builder\"; nextThreshold = 500; }\n        else if (pouchEggs < 1000) { rank = \"Nest Builder\"; icon = \"🏠\"; nextRank = \"Egg Guardian\"; nextThreshold = 1000; }\n        else if (pouchEggs < 2500) { rank = \"Egg Guardian\"; icon = \"🛡️\"; nextRank = \"Yoshi Knight\"; nextThreshold = 2500; }\n        else if (pouchEggs < 5000) { rank = \"Yoshi Knight\"; icon = \"⚔️\"; nextRank = \"Grand Yoshi\"; nextThreshold = 5000; }\n        else if (pouchEggs < 10000) { rank = \"Grand Yoshi\"; icon = \"👑\"; nextRank = \"Egg Emperor\"; nextThreshold = 10000; }\n        else { rank = \"Egg Emperor\"; icon = \"🌟\"; nextRank = \"MAX\"; nextThreshold = 0; }\n        \n        string message = $\"@{userName} | {icon} {rank} ({pouchEggs} 🥚)\";\n        if (nextThreshold > 0) {\n            message += $\" | Next: {nextRank} ({nextThreshold - pouchEggs} needed)\";\n        } else {\n            message += \" | 🎉 MAX RANK!\";\n        }\n        \n        CPH.SendMessage(message);\n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        string rank = \"\", icon = \"\", nextRank = \"\";\n        int nextThreshold = 0;\n        \n        if (pouchEggs < 100) { rank = \"Hatchling\"; icon = \"\ud83e\udd5a\"; nextRank = \"Egg Runner\"; nextThreshold = 100; }\n        else if (pouchEggs < 500) { rank = \"Egg Runner\"; icon = \"\ud83c\udfc3\"; nextRank = \"Nest Builder\"; nextThreshold = 500; }\n        else if (pouchEggs < 1000) { rank = \"Nest Builder\"; icon = \"\ud83c\udfe0\"; nextRank = \"Egg Guardian\"; nextThreshold = 1000; }\n        else if (pouchEggs < 2500) { rank = \"Egg Guardian\"; icon = \"\ud83d\udee1\ufe0f\"; nextRank = \"Yoshi Knight\"; nextThreshold = 2500; }\n        else if (pouchEggs < 5000) { rank = \"Yoshi Knight\"; icon = \"\u2694\ufe0f\"; nextRank = \"Grand Yoshi\"; nextThreshold = 5000; }\n        else if (pouchEggs < 10000) { rank = \"Grand Yoshi\"; icon = \"\ud83d\udc51\"; nextRank = \"Egg Emperor\"; nextThreshold = 10000; }\n        else { rank = \"Egg Emperor\"; icon = \"\ud83c\udf1f\"; nextRank = \"MAX\"; nextThreshold = 0; }\n        \n        string message = $\"@{userName} | {icon} {rank} ({pouchEggs} \ud83e\udd5a)\";\n        if (nextThreshold > 0) {\n            message += $\" | Next: {nextRank} ({nextThreshold - pouchEggs} needed)\";\n        } else {\n            message += \" | \ud83c\udf89 MAX RANK!\";\n        }\n        \n        CPH.SendMessage(message);\n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "view-inventory",
       "name": "[USER] View Inventory",
       "enabled": true,
       "group": "User",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int mysteryEggs = CPH.GetGlobalVar<int>($\"{userId}_MysteryEgg\", true);\n        int diceEggs = CPH.GetGlobalVar<int>($\"{userId}_DiceEgg\", true);\n        int duelEggs = CPH.GetGlobalVar<int>($\"{userId}_DuelEgg\", true);\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        CPH.SendMessage($\"@{userName}'s Egg Pack 🎒 | {pouchEggs} 🥚 | {mysteryEggs} Mystery 🔮 | {diceEggs} Dice 🎲 | {duelEggs} Duel ⚔️\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int mysteryEggs = CPH.GetGlobalVar<int>($\"{userId}_MysteryEgg\", true);\n        int diceEggs = CPH.GetGlobalVar<int>($\"{userId}_DiceEgg\", true);\n        int duelEggs = CPH.GetGlobalVar<int>($\"{userId}_DuelEgg\", true);\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        CPH.SendMessage($\"@{userName}'s Egg Pack \ud83c\udf92 | {pouchEggs} \ud83e\udd5a | {mysteryEggs} Mystery \ud83d\udd2e | {diceEggs} Dice \ud83c\udfb2 | {duelEggs} Duel \u2694\ufe0f\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "view-sheet",
       "name": "[USER] View Character Sheet",
       "enabled": true,
       "group": "User",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int chompStreak = CPH.GetGlobalVar<int>($\"{userId}_chompStreak\", true);\n        int chompWins = CPH.GetGlobalVar<int>($\"{userId}_chompWins\", true);\n        int eggrollPlays = CPH.GetGlobalVar<int>($\"{userId}_eggrollPlays\", true);\n        int duelWins = CPH.GetGlobalVar<int>($\"{userId}_duelWins\", true);\n        int duelLosses = CPH.GetGlobalVar<int>($\"{userId}_duelLosses\", true);\n        \n        CPH.SendMessage($\"@{userName}'s Stats 📋 | Chomp Streak: {chompStreak} | Egg Rolls: {eggrollPlays} | Duels: {duelWins}W/{duelLosses}L\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int chompStreak = CPH.GetGlobalVar<int>($\"{userId}_chompStreak\", true);\n        int chompWins = CPH.GetGlobalVar<int>($\"{userId}_chompWins\", true);\n        int eggrollPlays = CPH.GetGlobalVar<int>($\"{userId}_eggrollPlays\", true);\n        int duelWins = CPH.GetGlobalVar<int>($\"{userId}_duelWins\", true);\n        int duelLosses = CPH.GetGlobalVar<int>($\"{userId}_duelLosses\", true);\n        \n        CPH.SendMessage($\"@{userName}'s Stats \ud83d\udccb | Chomp Streak: {chompStreak} | Egg Rolls: {eggrollPlays} | Duels: {duelWins}W/{duelLosses}L\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "character-reset",
       "name": "[USER] Reset Character",
       "enabled": true,
       "group": "User",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int resetCost = 1000;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < resetCost)\n        {\n            CPH.SendMessage($\"@{userName}, character reroll costs {resetCost} 🥚. You have {userBalance} 🥚\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, resetCost, \"Character Reroll\");\n        \n        CPH.SetGlobalVar($\"{userId}_chompStreak\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_chompWins\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_eggrollPlays\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_duelWins\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_duelLosses\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_MysteryEgg\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_DiceEgg\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_DuelEgg\", 0, true);\n        \n        CPH.SendMessage($\"🔄 @{userName} rerolled for {resetCost} 🥚! All stats and tokens reset.\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int resetCost = 1000;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < resetCost)\n        {\n            CPH.SendMessage($\"@{userName}, character reroll costs {resetCost} \ud83e\udd5a. You have {userBalance} \ud83e\udd5a\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, resetCost, \"Character Reroll\");\n        \n        CPH.SetGlobalVar($\"{userId}_chompStreak\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_chompWins\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_eggrollPlays\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_duelWins\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_duelLosses\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_MysteryEgg\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_DiceEgg\", 0, true);\n        CPH.SetGlobalVar($\"{userId}_DuelEgg\", 0, true);\n        \n        CPH.SendMessage($\"\ud83d\udd04 @{userName} rerolled for {resetCost} \ud83e\udd5a! All stats and tokens reset.\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "check-funds",
       "name": "[MOD] Check Economy Funds",
       "enabled": true,
       "group": "Moderator",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SendMessage($\"💰 Economy Funds | Big Nest: {bigNestFund} 🥚 | Jackpot: {eggCartonJackpot} 🥚\");\n        \n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SendMessage($\"\ud83d\udcb0 Economy Funds | Big Nest: {bigNestFund} \ud83e\udd5a | Jackpot: {eggCartonJackpot} \ud83e\udd5a\");\n        \n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "dnd-adventure",
       "name": "[GAME] DnD Adventure",
       "enabled": true,
       "group": "Games",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string cooldownVar = $\"{userId}_adventureLastPlayed\";\n        long lastPlayed = CPH.GetGlobalVar<long>(cooldownVar, true);\n        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();\n        long cooldownSeconds = 86400;\n        \n        if (lastPlayed > 0 && (currentTime - lastPlayed) < cooldownSeconds)\n        {\n            long remainingSeconds = cooldownSeconds - (currentTime - lastPlayed);\n            long hours = remainingSeconds / 3600;\n            long minutes = (remainingSeconds % 3600) / 60;\n            CPH.SendMessage($\"@{userName}, daily adventure ready in {hours}h {minutes}m! 🗡️\");\n            return false;\n        }\n        \n        int currentEggs = CPH.GetPoints(userId);\n        int adventureCost = 500;\n        \n        if (currentEggs < adventureCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {adventureCost} 🥚 for an adventure! You have {currentEggs} 🥚.\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, adventureCost, \"DnD Adventure Entry\");\n        CPH.SetGlobalVar(cooldownVar, currentTime, true);\n        \n        Random rnd = new Random();\n        string[] savingThrows = { \"STR\", \"DEX\", \"CON\", \"INT\", \"WIS\", \"CHA\", \"DEATH\" };\n        string saveType = savingThrows[rnd.Next(savingThrows.Length)];\n        int roll = rnd.Next(1, 21);\n        \n        string scenario = GetScenario(saveType, roll, rnd);\n        int eggReward = 0;\n        int tokenReward = 0;\n        string tokenType = \"\";\n        \n        if (roll == 1)\n        {\n            eggReward = -rnd.Next(200, 301);\n            scenario += $\" Lose {Math.Abs(eggReward)} 🥚!\";\n        }\n        else if (roll <= 5)\n        {\n            eggReward = -rnd.Next(50, 101);\n            scenario += $\" Lose {Math.Abs(eggReward)} 🥚.\";\n        }\n        else if (roll <= 10)\n        {\n            eggReward = rnd.Next(100, 301);\n            scenario += $\" Gain {eggReward} 🥚!\";\n        }\n        else if (roll <= 15)\n        {\n            eggReward = rnd.Next(400, 601);\n            if (rnd.Next(1, 3) == 1)\n            {\n                tokenReward = 1;\n                tokenType = GetRandomToken(rnd);\n            }\n            scenario += tokenReward > 0 ? $\" {eggReward} 🥚 + 1 {tokenType}!\" : $\" {eggReward} 🥚!\";\n        }\n        else if (roll <= 19)\n        {\n            eggReward = rnd.Next(700, 901);\n            tokenReward = 1;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" {eggReward} 🥚 + 1 {tokenType}!\";\n        }\n        else\n        {\n            eggReward = rnd.Next(1000, 1501);\n            tokenReward = 2;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" CRIT! {eggReward} 🥚 + 2 {tokenType}!\";\n        }\n        \n        if (eggReward > 0) CPH.AddPoints(userId, eggReward, \"DnD Adventure Win\");\n        else if (eggReward < 0) CPH.RemovePoints(userId, Math.Abs(eggReward), \"DnD Adventure Loss\");\n        \n        if (tokenReward > 0)\n        {\n            string tokenVar = $\"{userId}_{tokenType}\";\n            int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n            CPH.SetGlobalVar(tokenVar, currentTokens + tokenReward, true);\n        }\n        \n        int totalAdventures = CPH.GetGlobalVar<int>($\"{userId}_totalAdventures\", true);\n        CPH.SetGlobalVar($\"{userId}_totalAdventures\", totalAdventures + 1, true);\n        \n        CPH.SendMessage($\"🎲 @{userName} | {saveType} (Roll: {roll}) | {scenario}\");\n        return true;\n    }\n    \n    private string GetScenario(string saveType, int roll, Random rnd)\n    {\n        string[] scenarios;\n        string base_scenario;\n        \n        switch (saveType)\n        {\n            case \"STR\":\n                scenarios = new string[] { \"A boulder blocks your path!\", \"You must lift a portcullis!\", \"An iron door stands before you!\", \"You wrestle a troll!\", \"A bridge collapses!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Catastrophic fail.\";\n                if (roll <= 5) return base_scenario + \" Can't overcome.\";\n                if (roll <= 10) return base_scenario + \" Barely manage.\";\n                if (roll <= 15) return base_scenario + \" Success!\";\n                if (roll <= 19) return base_scenario + \" Dominate!\";\n                return base_scenario + \" Godly might!\";\n            case \"DEX\":\n                scenarios = new string[] { \"Poison darts!\", \"Floor collapses!\", \"Swinging axes!\", \"Must leap across!\", \"Arrows fly!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Full hit.\";\n                if (roll <= 5) return base_scenario + \" Too slow.\";\n                if (roll <= 10) return base_scenario + \" Narrowly avoid.\";\n                if (roll <= 15) return base_scenario + \" Graceful dodge!\";\n                if (roll <= 19) return base_scenario + \" Acrobatic!\";\n                return base_scenario + \" Impossible backflip!\";\n            case \"CON\":\n                scenarios = new string[] { \"Toxic gas!\", \"Venomous bite!\", \"Cursed water!\", \"Freezing cold!\", \"Disease!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Body fails.\";\n                if (roll <= 5) return base_scenario + \" Suffer badly.\";\n                if (roll <= 10) return base_scenario + \" Weakened.\";\n                if (roll <= 15) return base_scenario + \" Resist!\";\n                if (roll <= 19) return base_scenario + \" Strong!\";\n                return base_scenario + \" Immune!\";\n            case \"INT\":\n                scenarios = new string[] { \"Ancient puzzle!\", \"Cryptic riddle!\", \"Magical trap!\", \"Mysterious tome!\", \"Illusion!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Disaster.\";\n                if (roll <= 5) return base_scenario + \" Can't solve.\";\n                if (roll <= 10) return base_scenario + \" Struggle through.\";\n                if (roll <= 15) return base_scenario + \" Clever!\";\n                if (roll <= 19) return base_scenario + \" Genius!\";\n                return base_scenario + \" Brilliant!\";\n            case \"WIS\":\n                scenarios = new string[] { \"Siren's song!\", \"Mind spores!\", \"Madness whispers!\", \"Hidden danger!\", \"Evil presence!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Succumb.\";\n                if (roll <= 5) return base_scenario + \" Influenced.\";\n                if (roll <= 10) return base_scenario + \" Resist strain.\";\n                if (roll <= 15) return base_scenario + \" See through!\";\n                if (roll <= 19) return base_scenario + \" Fortitude!\";\n                return base_scenario + \" Turn it back!\";\n            case \"CHA\":\n                scenarios = new string[] { \"Hostile bandits!\", \"Dragon demands!\", \"Guards question!\", \"Merchant haggles!\", \"Rival challenges!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Gravely offend.\";\n                if (roll <= 5) return base_scenario + \" Make it worse.\";\n                if (roll <= 10) return base_scenario + \" Barely convince.\";\n                if (roll <= 15) return base_scenario + \" Charm them!\";\n                if (roll <= 19) return base_scenario + \" New allies!\";\n                return base_scenario + \" Legendary!\";\n            case \"DEATH\":\n                scenarios = new string[] { \"On the brink!\", \"Life fades!\", \"Slipping away!\", \"Darkness closes!\", \"Heartbeat slows!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Fail to stabilize.\";\n                if (roll <= 5) return base_scenario + \" Barely conscious.\";\n                if (roll <= 10) return base_scenario + \" Stabilize weakly.\";\n                if (roll <= 15) return base_scenario + \" Recover!\";\n                if (roll <= 19) return base_scenario + \" Spring back!\";\n                return base_scenario + \" Defy death!\";\n            default:\n                return \"Mysterious event.\";\n        }\n    }\n    \n    private string GetRandomToken(Random rnd)\n    {\n        string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\" };\n        return tokens[rnd.Next(tokens.Length)];\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        string cooldownVar = $\"{userId}_adventureLastPlayed\";\n        long lastPlayed = CPH.GetGlobalVar<long>(cooldownVar, true);\n        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();\n        long cooldownSeconds = 86400;\n        \n        if (lastPlayed > 0 && (currentTime - lastPlayed) < cooldownSeconds)\n        {\n            long remainingSeconds = cooldownSeconds - (currentTime - lastPlayed);\n            long hours = remainingSeconds / 3600;\n            long minutes = (remainingSeconds % 3600) / 60;\n            CPH.SendMessage($\"@{userName}, daily adventure ready in {hours}h {minutes}m! \ud83d\udde1\ufe0f\");\n            return false;\n        }\n        \n        int currentEggs = CPH.GetPoints(userId);\n        int adventureCost = 500;\n        \n        if (currentEggs < adventureCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {adventureCost} \ud83e\udd5a for an adventure! You have {currentEggs} \ud83e\udd5a.\");\n            return false;\n        }\n        \n        CPH.RemovePoints(userId, adventureCost, \"DnD Adventure Entry\");\n        CPH.SetGlobalVar(cooldownVar, currentTime, true);\n        \n        Random rnd = new Random();\n        string[] savingThrows = { \"STR\", \"DEX\", \"CON\", \"INT\", \"WIS\", \"CHA\", \"DEATH\" };\n        string saveType = savingThrows[rnd.Next(savingThrows.Length)];\n        int roll = rnd.Next(1, 21);\n        \n        string scenario = GetScenario(saveType, roll, rnd);\n        int eggReward = 0;\n        int tokenReward = 0;\n        string tokenType = \"\";\n        \n        if (roll == 1)\n        {\n            eggReward = -rnd.Next(200, 301);\n            scenario += $\" Lose {Math.Abs(eggReward)} \ud83e\udd5a!\";\n        }\n        else if (roll <= 5)\n        {\n            eggReward = -rnd.Next(50, 101);\n            scenario += $\" Lose {Math.Abs(eggReward)} \ud83e\udd5a.\";\n        }\n        else if (roll <= 10)\n        {\n            eggReward = rnd.Next(100, 301);\n            scenario += $\" Gain {eggReward} \ud83e\udd5a!\";\n        }\n        else if (roll <= 15)\n        {\n            eggReward = rnd.Next(400, 601);\n            if (rnd.Next(1, 3) == 1)\n            {\n                tokenReward = 1;\n                tokenType = GetRandomToken(rnd);\n            }\n            scenario += tokenReward > 0 ? $\" {eggReward} \ud83e\udd5a + 1 {tokenType}!\" : $\" {eggReward} \ud83e\udd5a!\";\n        }\n        else if (roll <= 19)\n        {\n            eggReward = rnd.Next(700, 901);\n            tokenReward = 1;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" {eggReward} \ud83e\udd5a + 1 {tokenType}!\";\n        }\n        else\n        {\n            eggReward = rnd.Next(1000, 1501);\n            tokenReward = 2;\n            tokenType = GetRandomToken(rnd);\n            scenario += $\" CRIT! {eggReward} \ud83e\udd5a + 2 {tokenType}!\";\n        }\n        \n        if (eggReward > 0) CPH.AddPoints(userId, eggReward, \"DnD Adventure Win\");\n        else if (eggReward < 0) CPH.RemovePoints(userId, Math.Abs(eggReward), \"DnD Adventure Loss\");\n        \n        if (tokenReward > 0)\n        {\n            string tokenVar = $\"{userId}_{tokenType}\";\n            int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n            CPH.SetGlobalVar(tokenVar, currentTokens + tokenReward, true);\n        }\n        \n        int totalAdventures = CPH.GetGlobalVar<int>($\"{userId}_totalAdventures\", true);\n        CPH.SetGlobalVar($\"{userId}_totalAdventures\", totalAdventures + 1, true);\n        \n        CPH.SendMessage($\"\ud83c\udfb2 @{userName} | {saveType} (Roll: {roll}) | {scenario}\");\n        return true;\n    }\n    \n    private string GetScenario(string saveType, int roll, Random rnd)\n    {\n        string[] scenarios;\n        string base_scenario;\n        \n        switch (saveType)\n        {\n            case \"STR\":\n                scenarios = new string[] { \"A boulder blocks your path!\", \"You must lift a portcullis!\", \"An iron door stands before you!\", \"You wrestle a troll!\", \"A bridge collapses!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Catastrophic fail.\";\n                if (roll <= 5) return base_scenario + \" Can't overcome.\";\n                if (roll <= 10) return base_scenario + \" Barely manage.\";\n                if (roll <= 15) return base_scenario + \" Success!\";\n                if (roll <= 19) return base_scenario + \" Dominate!\";\n                return base_scenario + \" Godly might!\";\n            case \"DEX\":\n                scenarios = new string[] { \"Poison darts!\", \"Floor collapses!\", \"Swinging axes!\", \"Must leap across!\", \"Arrows fly!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Full hit.\";\n                if (roll <= 5) return base_scenario + \" Too slow.\";\n                if (roll <= 10) return base_scenario + \" Narrowly avoid.\";\n                if (roll <= 15) return base_scenario + \" Graceful dodge!\";\n                if (roll <= 19) return base_scenario + \" Acrobatic!\";\n                return base_scenario + \" Impossible backflip!\";\n            case \"CON\":\n                scenarios = new string[] { \"Toxic gas!\", \"Venomous bite!\", \"Cursed water!\", \"Freezing cold!\", \"Disease!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Body fails.\";\n                if (roll <= 5) return base_scenario + \" Suffer badly.\";\n                if (roll <= 10) return base_scenario + \" Weakened.\";\n                if (roll <= 15) return base_scenario + \" Resist!\";\n                if (roll <= 19) return base_scenario + \" Strong!\";\n                return base_scenario + \" Immune!\";\n            case \"INT\":\n                scenarios = new string[] { \"Ancient puzzle!\", \"Cryptic riddle!\", \"Magical trap!\", \"Mysterious tome!\", \"Illusion!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Disaster.\";\n                if (roll <= 5) return base_scenario + \" Can't solve.\";\n                if (roll <= 10) return base_scenario + \" Struggle through.\";\n                if (roll <= 15) return base_scenario + \" Clever!\";\n                if (roll <= 19) return base_scenario + \" Genius!\";\n                return base_scenario + \" Brilliant!\";\n            case \"WIS\":\n                scenarios = new string[] { \"Siren's song!\", \"Mind spores!\", \"Madness whispers!\", \"Hidden danger!\", \"Evil presence!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Succumb.\";\n                if (roll <= 5) return base_scenario + \" Influenced.\";\n                if (roll <= 10) return base_scenario + \" Resist strain.\";\n                if (roll <= 15) return base_scenario + \" See through!\";\n                if (roll <= 19) return base_scenario + \" Fortitude!\";\n                return base_scenario + \" Turn it back!\";\n            case \"CHA\":\n                scenarios = new string[] { \"Hostile bandits!\", \"Dragon demands!\", \"Guards question!\", \"Merchant haggles!\", \"Rival challenges!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Gravely offend.\";\n                if (roll <= 5) return base_scenario + \" Make it worse.\";\n                if (roll <= 10) return base_scenario + \" Barely convince.\";\n                if (roll <= 15) return base_scenario + \" Charm them!\";\n                if (roll <= 19) return base_scenario + \" New allies!\";\n                return base_scenario + \" Legendary!\";\n            case \"DEATH\":\n                scenarios = new string[] { \"On the brink!\", \"Life fades!\", \"Slipping away!\", \"Darkness closes!\", \"Heartbeat slows!\" };\n                base_scenario = scenarios[rnd.Next(scenarios.Length)];\n                if (roll == 1) return base_scenario + \" Fail to stabilize.\";\n                if (roll <= 5) return base_scenario + \" Barely conscious.\";\n                if (roll <= 10) return base_scenario + \" Stabilize weakly.\";\n                if (roll <= 15) return base_scenario + \" Recover!\";\n                if (roll <= 19) return base_scenario + \" Spring back!\";\n                return base_scenario + \" Defy death!\";\n            default:\n                return \"Mysterious event.\";\n        }\n    }\n    \n    private string GetRandomToken(Random rnd)\n    {\n        string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\" };\n        return tokens[rnd.Next(tokens.Length)];\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     },
     {
+      "$type": "Streamer.bot.Data.Action, Streamer.bot",
       "id": "top-leaderboard",
       "name": "[USER] Top Leaderboard",
       "enabled": true,
       "group": "User",
+      "random": false,
+      "concurrent": true,
+      "queue": false,
+      "queuePaused": false,
+      "triggers": [],
       "subActions": [
         {
-          "type": "ExecuteCode",
-          "language": "CSharp",
-          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        CPH.SendMessage(\"🏆 Top Egg Holders! Check Streamer.bot's loyalty panel or use !eggs to see your balance!\");\n        return true;\n    }\n}"
+          "$type": "Streamer.bot.Plugin.Action.Sub.Execute.ExecuteCode, Streamer.bot",
+          "name": "Execute Code (C#)",
+          "enabled": true,
+          "code": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        CPH.SendMessage(\"\ud83c\udfc6 Top Egg Holders! Check Streamer.bot's loyalty panel or use !eggs to see your balance!\");\n        return true;\n    }\n}",
+          "compileOnLoad": true
         }
       ]
     }
   ],
   "commands": [
     {
-      "command": "!buy",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "62e63639-aaf7-4d7b-ad8e-31d77b860ca5",
+      "name": "!buy",
       "enabled": true,
-      "action": "buy-token",
-      "permissions": "Everyone",
-      "userCooldown": 5,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 5,
+      "cooldownGlobal": 0,
+      "actionId": "buy-token",
+      "action": "buy-token"
     },
     {
-      "command": "!chomp",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "f0986bb5-8157-4749-93de-19937710c014",
+      "name": "!chomp",
       "enabled": true,
-      "action": "chomp-tunnel",
-      "permissions": "Everyone",
-      "userCooldown": 10,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 10,
+      "cooldownGlobal": 0,
+      "actionId": "chomp-tunnel",
+      "action": "chomp-tunnel"
     },
     {
-      "command": "!eggroll",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "690e851a-b55d-4c98-9a06-8755b8166a49",
+      "name": "!eggroll",
       "enabled": true,
-      "action": "hatch-roll",
-      "permissions": "Everyone",
-      "userCooldown": 10,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 10,
+      "cooldownGlobal": 0,
+      "actionId": "hatch-roll",
+      "action": "hatch-roll"
     },
     {
-      "command": "!duelnest",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "86762ffc-cfcd-446c-a35a-11e5df20531d",
+      "name": "!duelnest",
       "enabled": true,
-      "action": "duel-challenge",
-      "permissions": "Everyone",
-      "userCooldown": 30,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 30,
+      "cooldownGlobal": 0,
+      "actionId": "duel-challenge",
+      "action": "duel-challenge"
     },
     {
-      "command": "!accept",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "f588a945-8f98-49b4-82ad-d763c3195133",
+      "name": "!accept",
       "enabled": true,
-      "action": "duel-accept",
-      "permissions": "Everyone",
-      "userCooldown": 5,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 5,
+      "cooldownGlobal": 0,
+      "actionId": "duel-accept",
+      "action": "duel-accept"
     },
     {
-      "command": "!titles",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "3639d1d8-b38d-4654-9a95-b9efc7a20283",
+      "name": "!titles",
       "enabled": true,
-      "action": "view-titles",
-      "permissions": "Everyone",
-      "userCooldown": 15,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 15,
+      "cooldownGlobal": 0,
+      "actionId": "view-titles",
+      "action": "view-titles"
     },
     {
-      "command": "!eggpack",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "30c47b73-963a-4a1c-b4f2-f6622f30a3bf",
+      "name": "!eggpack",
       "enabled": true,
-      "action": "view-inventory",
-      "permissions": "Everyone",
-      "userCooldown": 10,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 10,
+      "cooldownGlobal": 0,
+      "actionId": "view-inventory",
+      "action": "view-inventory"
     },
     {
-      "command": "!sheet",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "56028d5b-b2ff-4a1a-b654-e7d3ab25da67",
+      "name": "!sheet",
       "enabled": true,
-      "action": "view-sheet",
-      "permissions": "Everyone",
-      "userCooldown": 10,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 10,
+      "cooldownGlobal": 0,
+      "actionId": "view-sheet",
+      "action": "view-sheet"
     },
     {
-      "command": "!reroll",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "5a1db152-1ec6-462c-9e41-0ebef16511e5",
+      "name": "!reroll",
       "enabled": true,
-      "action": "character-reset",
-      "permissions": "Everyone",
-      "userCooldown": 60,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 60,
+      "cooldownGlobal": 0,
+      "actionId": "character-reset",
+      "action": "character-reset"
     },
     {
-      "command": "!econfunds",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "6d9ae94b-bab6-42fe-b5ac-4d555e5bfcb8",
+      "name": "!econfunds",
       "enabled": true,
-      "action": "check-funds",
-      "permissions": "Moderators",
-      "userCooldown": 30,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Moderators",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 30,
+      "cooldownGlobal": 0,
+      "actionId": "check-funds",
+      "action": "check-funds"
     },
     {
-      "command": "!adventure",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "f7394757-94e1-4f1d-9bd4-5040d617f11d",
+      "name": "!adventure",
       "enabled": true,
-      "action": "dnd-adventure",
-      "permissions": "Everyone",
-      "userCooldown": 5,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 5,
+      "cooldownGlobal": 0,
+      "actionId": "dnd-adventure",
+      "action": "dnd-adventure"
     },
     {
-      "command": "!top",
+      "$type": "Streamer.bot.Data.Command, Streamer.bot",
+      "id": "dc5c4787-d517-4013-ac9b-e3c296cfa0b0",
+      "name": "!top",
       "enabled": true,
-      "action": "top-leaderboard",
-      "permissions": "Everyone",
-      "userCooldown": 30,
-      "globalCooldown": 0
+      "group": "Default",
+      "permission": "Everyone",
+      "caseSensitive": false,
+      "ignoreMe": false,
+      "regex": false,
+      "location": 0,
+      "sources": {
+        "twitch": true,
+        "youtube": false,
+        "trovo": false
+      },
+      "cooldownUser": 30,
+      "cooldownGlobal": 0,
+      "actionId": "top-leaderboard",
+      "action": "top-leaderboard"
     }
   ],
+  "timedActions": [
+    {
+      "$type": "Streamer.bot.Data.TimedAction, Streamer.bot",
+      "id": "f9f1e1ac-0745-4a4d-94d9-3b3029a8e4f4",
+      "name": "Duel Resolver Timer",
+      "enabled": true,
+      "group": "Default",
+      "interval": 60,
+      "repeat": true,
+      "lines": 0,
+      "actionId": "duel-resolver",
+      "action": "duel-resolver"
+    }
+  ],
+  "triggers": [],
+  "settings": {},
   "globalVariables": [
     {
       "name": "bigNestFund",
@@ -291,35 +562,5 @@
       "persisted": true,
       "description": "Jackpot fund - collects 20% of token purchases"
     }
-  ],
-  "timedActions": [
-    {
-      "name": "Duel Resolver Timer",
-      "action": "duel-resolver",
-      "interval": 60,
-      "enabled": true,
-      "repeat": true,
-      "description": "Checks every 60 seconds for duels that need to be resolved (10 minutes after acceptance)"
-    }
-  ],
-  "setupInstructions": [
-    "1. Import this file into Streamer.bot",
-    "2. Configure Pouch Eggs currency in Settings → Loyalty",
-    "3. Set passive income: 5 eggs per 10 minutes for online viewers, 10 for active chatters",
-    "4. Enable the !eggs command in loyalty settings",
-    "5. Verify the Duel Resolver Timer is enabled (checks every 60 seconds)",
-    "6. Test with !buy MysteryEgg 1, then !chomp",
-    "7. Ready to go live!"
-  ],
-  "features": [
-    "Token Economy: Mystery Eggs (20🥚), Dice Eggs (10🥚), Duel Eggs (5🥚)",
-    "Chomp Tunnel: Risk-based game with streak multipliers and golden eggs",
-    "Hatch Roll: D20 luck game with tiered rewards",
-    "Duel Nest PvP: Player vs player battles with auto-resolution",
-    "Rank System: 7 tiers from Hatchling to Egg Emperor",
-    "Currency Sinks: 10% of purchases removed, 15% of duels to economy fund",
-    "Economy Monitoring: Track funds and balance",
-    "DnD Adventure: Daily D20 adventures with 7 saving throw types",
-    "Top Command: View top egg holders"
   ]
 }

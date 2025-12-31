@@ -1,0 +1,27 @@
+# Backup files
+.backups/
+*.backup
+
+# Temporary files
+/tmp/
+*.tmp
+*.temp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Conversion scripts (tools, not part of the export)
+convert_to_streamerbot_format.py
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

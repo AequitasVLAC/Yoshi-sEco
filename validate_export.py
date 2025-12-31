@@ -67,10 +67,11 @@ def validate_streamerbot_export(json_data):
                         if 'code' not in subaction:
                             issues.append(f"{action_name} subAction {j}: ExecuteCode missing code field")
     
+    # Build action IDs set once for reuse in commands and timed actions validation
+    action_ids = {a['id'] for a in json_data.get('actions', []) if 'id' in a}
+    
     # Commands validation
     if 'commands' in json_data:
-        action_ids = {a['id'] for a in json_data.get('actions', []) if 'id' in a}
-        
         for i, command in enumerate(json_data['commands']):
             cmd_name = command.get('name', f'Command {i}')
             
@@ -89,8 +90,6 @@ def validate_streamerbot_export(json_data):
     
     # Timed actions validation
     if 'timedActions' in json_data:
-        action_ids = {a['id'] for a in json_data.get('actions', []) if 'id' in a}
-        
         for i, timed in enumerate(json_data['timedActions']):
             timed_name = timed.get('name', f'Timed Action {i}')
             

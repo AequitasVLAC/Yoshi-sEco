@@ -1,0 +1,143 @@
+{
+  "Name": "Yoshi's Island Eggonomy - Complete System",
+  "Version": "1.0.0",
+  "Description": "Complete modular Streamer.bot project for managing egg-based virtual currency and interactions. Includes currency, tokens, games, PvP, adventures, shop, and leaderboards.",
+  "Platform": "Streamer.bot v0.2.0+",
+  "Author": "Yoshi's Island Eggonomy Team",
+  "LastUpdated": "December 2025",
+  
+  "SystemOverview": {
+    "MainCurrency": "Pouch Eggs - earned passively through watching, chatting, cheering, subs, and raids",
+    "Tokens": [
+      "Mystery Eggs (20🥚) - For Chomp Tunnel game",
+      "Dice Eggs (10🥚) - For Hatch Roll game",
+      "Duel Eggs (5🥚) - For PvP battles",
+      "RR Tokens (50🥚) - Roulette protection",
+      "D20 Tokens (100🥚) - Daily adventures"
+    ],
+    "Games": [
+      "Roll20 - d20 game with rewards up to 2,000 eggs",
+      "Roulette - Shot-or-miss with dynamic rewards and risks",
+      "Chomp Tunnel - Streak-based Mystery Egg game",
+      "Hatch Roll - D20 luck-based Dice Egg game"
+    ],
+    "PvP": "Automatic combat with D&D narratives, token stealing, 10-min cooldown",
+    "Adventures": "Daily D&D-style quests with 7 saving throw types",
+    "Shop": "Virtual items, buffs, and premium rewards",
+    "Leaderboard": "Rank progression from Hatchling to Egg Emperor"
+  },
+  
+  "QuickStartCommands": {
+    "Currency": {
+      "!eggs": "Check your Pouch Egg balance",
+      "!eggpack": "View complete inventory (eggs + all tokens)"
+    },
+    "Tokens": {
+      "!buy <token> <qty>": "Purchase tokens (MysteryEgg, DiceEgg, DuelEgg, rrtoken, d20token)"
+    },
+    "Games": {
+      "!roll20": "Roll d20 for up to 2,000 eggs (10🥚 entry)",
+      "!roulette": "Roulette spin (10🥚 entry, use rrtoken for protection)",
+      "!chomp": "Play Chomp Tunnel (1 Mystery Egg)",
+      "!eggroll": "Play Hatch Roll (1 Dice Egg)"
+    },
+    "PvP": {
+      "!pvp @user <wager>": "Instant auto-battle (1 Duel Egg + wager)",
+      "!duelnest @user <wager>": "Challenge to duel (acceptance required)",
+      "!accept": "Accept a duel challenge"
+    },
+    "Adventures": {
+      "!adventure": "Daily D&D quest (1 d20token)",
+      "!adventuretime": "Check cooldown",
+      "!adventurestats": "View adventure stats"
+    },
+    "Shop": {
+      "!shop": "Browse shop catalog",
+      "!shopbuy <item>": "Purchase shop item",
+      "!myitems": "View purchased items"
+    },
+    "Progression": {
+      "!titles": "View your rank and progress",
+      "!sheet": "View all statistics",
+      "!top": "Top 5 egg earners",
+      "!ranks": "View all rank tiers",
+      "!reroll": "Reset character (1000🥚)"
+    }
+  },
+  
+  "EconomicSystem": {
+    "CurrencySources": [
+      "Passive viewing (5🥚 per 10 min)",
+      "Active chatting (10🥚 per 10 min)",
+      "Cheering (1🥚 per bit)",
+      "Subscriptions (100-500🥚 by tier)",
+      "Raids (50🥚)",
+      "Game winnings (variable)",
+      "Shop token bundles"
+    ],
+    "CurrencySinks": [
+      "Token purchases (10% removed, 70% to bigNestFund, 20% to jackpot)",
+      "Game entry costs (Roll20, Roulette)",
+      "Shop purchases (50% to bigNestFund)",
+      "Character reroll (1000🥚 removed)",
+      "PvP losses",
+      "Adventure failures"
+    ],
+    "GlobalFunds": {
+      "bigNestFund": "Primary economy reserve for streamer events and rewards",
+      "eggCartonJackpot": "Jackpot fund for special lottery events"
+    }
+  },
+  
+  "InstallationSteps": [
+    "1. Import this .sb file into Streamer.bot (Actions → Import)",
+    "2. Configure Loyalty System in Settings → Loyalty",
+    "3. Set currency name to 'Pouch Egg' / 'Pouch Eggs' with 🥚 icon",
+    "4. Set passive income rates (5/10 min watching, 10/10 min chatting)",
+    "5. Run 'Initialize Currency System' action once",
+    "6. Create commands for each action (see command list above)",
+    "7. Set up Duel Resolver Timer (60 sec interval, repeat enabled)",
+    "8. Test with !eggs, !buy, and game commands",
+    "9. Announce to community and go live!"
+  ],
+  
+  "ModuleReferences": {
+    "CurrencySetup": "See modules/CurrencySetup.sb for detailed currency implementation",
+    "TokenSystem": "See modules/TokenSystem.sb for token purchase and management",
+    "Games": "See modules/Games.sb for all game implementations",
+    "PvPMechanics": "See modules/PvPMechanics.sb for PvP battle system",
+    "Adventures": "See modules/Adventures.sb for D&D adventure system",
+    "Shop": "See modules/Shop.sb for shop catalog and purchases",
+    "Leaderboard": "See modules/Leaderboard.sb for rankings and progression"
+  },
+  
+  "Documentation": {
+    "QuickStartGuide": "docs/Quick_Start_Guide.md",
+    "UnifiedGuide": "docs/Unified_Yoshi_Eggonomy.md",
+    "VariableReference": "docs/Variable_Reference.md",
+    "EventSystemGuide": "docs/Event_System_Guide.md",
+    "AdvancedFeaturesGuide": "docs/Advanced_Features_Guide.md",
+    "DnDAdventureGuide": "docs/DnD_Adventure_Guide.md",
+    "TroubleshootingGuide": "docs/Troubleshooting_Guide.md"
+  },
+  
+  "SupportedEvents": {
+    "TwitchCheers": "Award eggs based on bits",
+    "TwitchSubs": "Award eggs based on tier",
+    "TwitchRaids": "Award eggs to raiding streamer",
+    "PassiveViewing": "Automatic egg accumulation",
+    "ActiveChatting": "Bonus eggs for participation"
+  },
+  
+  "Notes": {
+    "NoExternalDependencies": "100% runs within Streamer.bot - no external scripts, databases, or services",
+    "DataPersistence": "All data stored in Streamer.bot's SQLite database",
+    "Scalability": "Tested for communities up to 1000+ concurrent users",
+    "Customization": "All values easily adjustable in code",
+    "Balance": "Economy designed with built-in sinks to prevent inflation",
+    "Modular": "Each system can be enabled/disabled independently"
+  },
+  
+  "Credits": "Created for the Streamer.bot community by Yoshi's Island Eggonomy Team",
+  "License": "Free to use and modify for your stream"
+}

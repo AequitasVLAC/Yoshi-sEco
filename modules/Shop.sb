@@ -1,8 +1,111 @@
 {
-  "Name": "Shop",
-  "Description": "Enables purchasing of virtual items or rewards within Eggonomy.",
+  "Name": "Yoshi Eggonomy - Shop System",
+  "Version": "1.0.0",
+  "Description": "Virtual shop where players spend eggs on items, tokens, and rewards. Easily customizable catalog with support for various item types.",
+  "Platform": "Streamer.bot v0.2.0+",
+  "ShopCatalog": [
+    {
+      "ItemID": "goldenEgg",
+      "Name": "Golden Egg",
+      "Description": "A rare golden egg that grants special powers",
+      "Cost": 1000,
+      "Type": "Collectible",
+      "Icon": "🌟"
+    },
+    {
+      "ItemID": "megaToken",
+      "Name": "Mega Token Pack",
+      "Description": "Bundle of 5 Mystery Eggs + 5 Dice Eggs + 5 Duel Eggs",
+      "Cost": 150,
+      "Type": "Bundle",
+      "Icon": "🎁"
+    },
+    {
+      "ItemID": "luckyCharm",
+      "Name": "Lucky Charm",
+      "Description": "Increases roll luck for next game",
+      "Cost": 500,
+      "Type": "Buff",
+      "Icon": "🍀"
+    },
+    {
+      "ItemID": "eggDoubler",
+      "Name": "Egg Doubler",
+      "Description": "Doubles next game reward",
+      "Cost": 750,
+      "Type": "Buff",
+      "Icon": "✨"
+    },
+    {
+      "ItemID": "shoutout",
+      "Name": "Shoutout",
+      "Description": "Get a special shoutout from the streamer",
+      "Cost": 2000,
+      "Type": "Social",
+      "Icon": "📢"
+    },
+    {
+      "ItemID": "customEmote",
+      "Name": "Custom Emote Request",
+      "Description": "Request a custom emote idea",
+      "Cost": 5000,
+      "Type": "Premium",
+      "Icon": "😎"
+    }
+  ],
   "Actions": [
-    {"Name": "PurchaseItem", "Code": "<Item Purchase Logic>"},
-    {"Name": "ListShopItems", "Code": "<Logic for Listing Items>"}
-  ]
+    {
+      "Name": "View Shop Catalog",
+      "Description": "Display all available shop items",
+      "Trigger": "!shop",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        CPH.SendMessage(\"🏪 Yoshi's Shop: 1️⃣ Mega Token Pack (150🥚) 2️⃣ Lucky Charm (500🥚) 3️⃣ Egg Doubler (750🥚) 4️⃣ Golden Egg (1000🥚) 5️⃣ Shoutout (2000🥚) 6️⃣ Custom Emote (5000🥚) | Use: !buy <item>\");\n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Purchase Shop Item",
+      "Description": "Purchase an item from the shop",
+      "Trigger": "!shopbuy <itemID>",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        string itemId = args[\"rawInput0\"]?.ToString()?.ToLower();\n        \n        if (string.IsNullOrEmpty(itemId))\n        {\n            CPH.SendMessage($\"@{userName}, usage: !shopbuy <item> | Use !shop to see items\");\n            return false;\n        }\n        \n        // Shop catalog\n        Dictionary<string, (string name, int cost, string type, string icon)> shopItems = new Dictionary<string, (string, int, string, string)>\n        {\n            {\"megatoken\", (\"Mega Token Pack\", 150, \"bundle\", \"🎁\")},\n            {\"luckycharm\", (\"Lucky Charm\", 500, \"buff\", \"🍀\")},\n            {\"eggdoubler\", (\"Egg Doubler\", 750, \"buff\", \"✨\")},\n            {\"goldenegg\", (\"Golden Egg\", 1000, \"collectible\", \"🌟\")},\n            {\"shoutout\", (\"Shoutout\", 2000, \"social\", \"📢\")},\n            {\"customemote\", (\"Custom Emote Request\", 5000, \"premium\", \"😎\")}\n        };\n        \n        // Alias support\n        Dictionary<string, string> aliases = new Dictionary<string, string>\n        {\n            {\"mega\", \"megatoken\"},\n            {\"lucky\", \"luckycharm\"},\n            {\"doubler\", \"eggdoubler\"},\n            {\"golden\", \"goldenegg\"},\n            {\"shout\", \"shoutout\"},\n            {\"emote\", \"customemote\"},\n            {\"1\", \"megatoken\"},\n            {\"2\", \"luckycharm\"},\n            {\"3\", \"eggdoubler\"},\n            {\"4\", \"goldenegg\"},\n            {\"5\", \"shoutout\"},\n            {\"6\", \"customemote\"}\n        };\n        \n        // Resolve alias\n        if (aliases.ContainsKey(itemId))\n        {\n            itemId = aliases[itemId];\n        }\n        \n        if (!shopItems.ContainsKey(itemId))\n        {\n            CPH.SendMessage($\"@{userName}, item not found! Use !shop to see available items.\");\n            return false;\n        }\n        \n        var item = shopItems[itemId];\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < item.cost)\n        {\n            CPH.SendMessage($\"@{userName}, {item.name} costs {item.cost} 🥚 but you have {userBalance} 🥚\");\n            return false;\n        }\n        \n        // Process purchase\n        CPH.RemovePoints(userId, item.cost, $\"Shop: {item.name}\");\n        \n        // Apply item effects\n        switch (itemId)\n        {\n            case \"megatoken\":\n                // Award token bundle\n                int mystery = CPH.GetGlobalVar<int>($\"{userId}_MysteryEgg\", true);\n                int dice = CPH.GetGlobalVar<int>($\"{userId}_DiceEgg\", true);\n                int duel = CPH.GetGlobalVar<int>($\"{userId}_DuelEgg\", true);\n                CPH.SetGlobalVar($\"{userId}_MysteryEgg\", mystery + 5, true);\n                CPH.SetGlobalVar($\"{userId}_DiceEgg\", dice + 5, true);\n                CPH.SetGlobalVar($\"{userId}_DuelEgg\", duel + 5, true);\n                break;\n                \n            case \"luckycharm\":\n                // Apply luck buff\n                CPH.SetGlobalVar($\"{userId}_luckyCharm\", true, true);\n                CPH.SetGlobalVar($\"{userId}_luckyCharmExpiry\", DateTime.Now.AddHours(1).Ticks, true);\n                break;\n                \n            case \"eggdoubler\":\n                // Apply doubler buff\n                CPH.SetGlobalVar($\"{userId}_eggDoubler\", true, true);\n                break;\n                \n            case \"goldenegg\":\n                // Add to inventory\n                int goldenEggs = CPH.GetGlobalVar<int>($\"{userId}_goldenEggs\", true);\n                CPH.SetGlobalVar($\"{userId}_goldenEggs\", goldenEggs + 1, true);\n                break;\n                \n            case \"shoutout\":\n                // Queue shoutout\n                CPH.SetGlobalVar($\"shoutoutQueue_{userId}\", userName, true);\n                CPH.SendMessage($\"📢 {userName} purchased a shoutout! Streamer will deliver soon!\");\n                break;\n                \n            case \"customemote\":\n                // Queue emote request\n                CPH.SetGlobalVar($\"emoteQueue_{userId}\", userName, true);\n                CPH.SendMessage($\"😎 {userName} requested a custom emote! DM the streamer with your idea!\");\n                break;\n        }\n        \n        // Add to economy fund (50% of purchase)\n        int bigNestContribution = (int)(item.cost * 0.5);\n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + bigNestContribution, true);\n        \n        CPH.SendMessage($\"✅ @{userName} purchased {item.icon} {item.name} for {item.cost} 🥚!\");\n        \n        // Track purchase\n        int purchases = CPH.GetGlobalVar<int>($\"{userId}_shopPurchases\", true);\n        CPH.SetGlobalVar($\"{userId}_shopPurchases\", purchases + 1, true);\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "View Purchased Items",
+      "Description": "Display user's purchased items and buffs",
+      "Trigger": "!myitems",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        List<string> items = new List<string>();\n        \n        // Check for collectibles\n        int goldenEggs = CPH.GetGlobalVar<int>($\"{userId}_goldenEggs\", true);\n        if (goldenEggs > 0) items.Add($\"{goldenEggs} Golden Egg(s) 🌟\");\n        \n        // Check for active buffs\n        bool luckyCharm = CPH.GetGlobalVar<bool>($\"{userId}_luckyCharm\", true);\n        if (luckyCharm)\n        {\n            long expiry = CPH.GetGlobalVar<long>($\"{userId}_luckyCharmExpiry\", true);\n            if (DateTime.Now.Ticks < expiry)\n            {\n                items.Add(\"Lucky Charm (Active) 🍀\");\n            }\n        }\n        \n        bool eggDoubler = CPH.GetGlobalVar<bool>($\"{userId}_eggDoubler\", true);\n        if (eggDoubler) items.Add(\"Egg Doubler (Ready) ✨\");\n        \n        // Total purchases\n        int purchases = CPH.GetGlobalVar<int>($\"{userId}_shopPurchases\", true);\n        \n        string message = $\"@{userName}'s Items: \";\n        if (items.Count > 0)\n        {\n            message += string.Join(\" | \", items);\n        }\n        else\n        {\n            message += \"No items yet! Use !shop to browse.\";\n        }\n        \n        message += $\" | Total Purchases: {purchases}\";\n        \n        CPH.SendMessage(message);\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Add Shop Item (Mod)",
+      "Description": "Moderators can add custom items to the shop dynamically",
+      "Trigger": "!shopadd <itemID> <cost> <name>",
+      "Permissions": "Moderator",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string modName = args[\"userName\"].ToString();\n        string itemId = args[\"rawInput0\"]?.ToString()?.ToLower();\n        \n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int cost))\n        {\n            CPH.SendMessage($\"@{modName}, usage: !shopadd <itemID> <cost> <name>\");\n            return false;\n        }\n        \n        string itemName = args[\"rawInput2\"]?.ToString() ?? \"Custom Item\";\n        \n        // Store custom item\n        CPH.SetGlobalVar($\"shopItem_{itemId}_name\", itemName, true);\n        CPH.SetGlobalVar($\"shopItem_{itemId}_cost\", cost, true);\n        CPH.SetGlobalVar($\"shopItem_{itemId}_enabled\", true, true);\n        \n        CPH.SendMessage($\"✅ Custom item '{itemName}' added to shop for {cost} 🥚!\");\n        \n        return true;\n    }\n}"
+      }
+    }
+  ],
+  "Documentation": {
+    "Commands": {
+      "ViewShop": \"!shop - Display all available shop items\",
+      \"BuyItem\": \"!shopbuy <item> - Purchase an item from the shop\",
+      \"ViewItems\": \"!myitems - View your purchased items and active buffs\",
+      \"AddItem\": \"!shopadd <itemID> <cost> <name> - (Mod) Add custom shop item\"
+    },
+    "ItemTypes": {
+      "Collectibles": \"Permanent items added to inventory (Golden Eggs)\",
+      "Buffs": \"Temporary or one-time bonuses (Lucky Charm, Egg Doubler)\",
+      "Bundles": \"Token packs and multi-item purchases\",
+      "Social": \"Stream interactions (Shoutouts)\",
+      "Premium": \"High-value custom rewards (Emote Requests)\"
+    },
+    "EconomySink": \"50% of shop purchases go to bigNestFund for economic balance\"
+  }
 }

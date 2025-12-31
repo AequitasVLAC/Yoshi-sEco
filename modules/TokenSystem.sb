@@ -1,8 +1,85 @@
 {
-  "Name": "Token System",
-  "Description": "Manages tokens for advanced trading and features.",
+  "Name": "Yoshi Eggonomy - Token System",
+  "Version": "1.0.0",
+  "Description": "Token management system including rrtokens (roulette protection) and d20tokens (daily adventures). Tokens are purchased with Pouch Eggs and used for special games and features.",
+  "Platform": "Streamer.bot v0.2.0+",
+  "Tokens": [
+    {
+      "Name": "Mystery Egg",
+      "Variable": "MysteryEgg",
+      "Cost": 20,
+      "Description": "Used for Chomp Tunnel game (Roll20)",
+      "Icon": "🔮"
+    },
+    {
+      "Name": "Dice Egg",
+      "Variable": "DiceEgg",
+      "Cost": 10,
+      "Description": "Used for Hatch Roll game",
+      "Icon": "🎲"
+    },
+    {
+      "Name": "Duel Egg",
+      "Variable": "DuelEgg",
+      "Cost": 5,
+      "Description": "Used for PvP Duel Nest battles",
+      "Icon": "⚔️"
+    },
+    {
+      "Name": "RRToken",
+      "Variable": "rrtoken",
+      "Cost": 50,
+      "Description": "Roulette protection token - prevents penalties in Roulette game",
+      "Icon": "🛡️"
+    },
+    {
+      "Name": "D20Token",
+      "Variable": "d20token",
+      "Cost": 100,
+      "Description": "Daily D&D-style adventure token with saving throws",
+      "Icon": "🎲"
+    }
+  ],
   "Actions": [
-    {"Name": "GenerateToken", "Code": "<Token Generation Logic>"},
-    {"Name": "RedeemToken", "Code": "<Token Redemption Logic>"}
-  ]
+    {
+      "Name": "Buy Token",
+      "Description": "Purchase tokens using Pouch Eggs. Supports all token types.",
+      "Trigger": "!buy <TokenType> <Quantity>",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        string tokenType = args[\"rawInput0\"]?.ToString();\n        \n        // Validate quantity\n        if (args[\"rawInput1\"] == null || !int.TryParse(args[\"rawInput1\"].ToString(), out int quantity) || quantity < 1)\n        {\n            CPH.SendMessage($\"@{userName}, please specify a valid quantity! Example: !buy MysteryEgg 1\");\n            return false;\n        }\n        \n        // Define token costs\n        Dictionary<string, int> tokenCosts = new Dictionary<string, int>\n        {\n            {\"MysteryEgg\", 20},\n            {\"DiceEgg\", 10},\n            {\"DuelEgg\", 5},\n            {\"rrtoken\", 50},\n            {\"d20token\", 100}\n        };\n        \n        // Find matching token (case-insensitive)\n        string tokenKey = null;\n        foreach (var key in tokenCosts.Keys)\n        {\n            if (key.Equals(tokenType, StringComparison.OrdinalIgnoreCase))\n            {\n                tokenKey = key;\n                break;\n            }\n        }\n        \n        if (tokenKey == null)\n        {\n            CPH.SendMessage($\"@{userName}, invalid token! Available: MysteryEgg, DiceEgg, DuelEgg, rrtoken, d20token\");\n            return false;\n        }\n        \n        // Calculate cost\n        int totalCost = tokenCosts[tokenKey] * quantity;\n        int userBalance = CPH.GetPoints(userId);\n        \n        if (userBalance < totalCost)\n        {\n            CPH.SendMessage($\"@{userName}, you need {totalCost} 🥚 but only have {userBalance} 🥚\");\n            return false;\n        }\n        \n        // Process purchase\n        CPH.RemovePoints(userId, totalCost, \"Token Purchase\");\n        \n        // Add tokens to inventory\n        string tokenVar = $\"{userId}_{tokenKey}\";\n        int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n        CPH.SetGlobalVar(tokenVar, currentTokens + quantity, true);\n        \n        // Distribute to economy funds (70% bigNest, 20% jackpot, 10% sink)\n        int bigNestContribution = (int)(totalCost * 0.7);\n        int jackpotContribution = (int)(totalCost * 0.2);\n        \n        int bigNestFund = CPH.GetGlobalVar<int>(\"bigNestFund\", true);\n        int eggCartonJackpot = CPH.GetGlobalVar<int>(\"eggCartonJackpot\", true);\n        \n        CPH.SetGlobalVar(\"bigNestFund\", bigNestFund + bigNestContribution, true);\n        CPH.SetGlobalVar(\"eggCartonJackpot\", eggCartonJackpot + jackpotContribution, true);\n        \n        CPH.SendMessage($\"✅ @{userName} purchased {quantity} {tokenKey}(s) for {totalCost} 🥚!\");\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "View Inventory - Eggpack",
+      "Description": "Display user's complete inventory including all tokens and Pouch Eggs",
+      "Trigger": "!eggpack",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        // Get all token counts\n        int mysteryEggs = CPH.GetGlobalVar<int>($\"{userId}_MysteryEgg\", true);\n        int diceEggs = CPH.GetGlobalVar<int>($\"{userId}_DiceEgg\", true);\n        int duelEggs = CPH.GetGlobalVar<int>($\"{userId}_DuelEgg\", true);\n        int rrtokens = CPH.GetGlobalVar<int>($\"{userId}_rrtoken\", true);\n        int d20tokens = CPH.GetGlobalVar<int>($\"{userId}_d20token\", true);\n        \n        // Get Pouch Eggs\n        int pouchEggs = CPH.GetPoints(userId);\n        \n        CPH.SendMessage($\"@{userName}'s Egg Pack 🎒 | {pouchEggs} 🥚 | Mystery: {mysteryEggs} 🔮 | Dice: {diceEggs} 🎲 | Duel: {duelEggs} ⚔️ | RR: {rrtokens} 🛡️ | D20: {d20tokens} 🎲\");\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Check Token Balance",
+      "Description": "Check balance for a specific token type",
+      "Trigger": "Helper function",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string tokenType = args.ContainsKey(\"tokenType\") ? args[\"tokenType\"].ToString() : \"MysteryEgg\";\n        \n        string tokenVar = $\"{userId}_{tokenType}\";\n        int tokenCount = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        CPH.SetArgument(\"tokenCount\", tokenCount);\n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Consume Token",
+      "Description": "Deduct one token from user's inventory",
+      "Trigger": "Helper function",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string tokenType = args.ContainsKey(\"tokenType\") ? args[\"tokenType\"].ToString() : \"MysteryEgg\";\n        int amount = args.ContainsKey(\"amount\") ? int.Parse(args[\"amount\"].ToString()) : 1;\n        \n        string tokenVar = $\"{userId}_{tokenType}\";\n        int currentTokens = CPH.GetGlobalVar<int>(tokenVar, true);\n        \n        if (currentTokens < amount)\n        {\n            CPH.SetArgument(\"hasToken\", false);\n            return false;\n        }\n        \n        CPH.SetGlobalVar(tokenVar, currentTokens - amount, true);\n        CPH.SetArgument(\"hasToken\", true);\n        return true;\n    }\n}"
+      }
+    }
+  ],
+  "Documentation": {
+    "Usage": {\n      \"BuyTokens\": \"!buy <TokenType> <Quantity>\",\n      \"ViewInventory\": \"!eggpack\",\n      \"Examples\": [\n        \"!buy MysteryEgg 1 - Purchase 1 Mystery Egg for 20 Pouch Eggs\",\n        \"!buy rrtoken 2 - Purchase 2 RR Tokens for 100 Pouch Eggs\",\n        \"!buy d20token 1 - Purchase 1 D20 Token for 100 Pouch Eggs\"\n      ]\n    },
+    "EconomyDistribution": "70% to bigNestFund, 20% to eggCartonJackpot, 10% removed (inflation control)"
+  }
 }

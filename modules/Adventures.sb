@@ -1,8 +1,61 @@
 {
-  "Name": "Adventures",
-  "Description": "Narrative-driven adventures integrated into Eggonomy.",
+  "Name": "Yoshi Eggonomy - Daily Adventures",
+  "Version": "1.0.0",
+  "Description": "D&D-style daily adventure system with saving throws (Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma, Death). Players use d20tokens to embark on narrative adventures with scaled rewards.",
+  "Platform": "Streamer.bot v0.2.0+",
   "Actions": [
-    {"Name": "StartAdventure", "Code": "<Adventure Start Logic>"},
-    {"Name": "ResolveAdventure", "Code": "<Logic for Resolving Adventure Outcomes>"}
-  ]
+    {
+      "Name": "Daily Adventure",
+      "Description": "Embark on a daily D&D-style adventure with saving throws and narrative outcomes",
+      "Trigger": "!adventure",
+      "Requirements": "1 d20token per adventure",
+      "Cooldown": "24 hours per user",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\nusing System.Collections.Generic;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        // Check cooldown (24 hours)\n        long lastAdventure = CPH.GetGlobalVar<long>($\"{userId}_adventureCooldown\", true);\n        if (lastAdventure > 0)\n        {\n            TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - lastAdventure);\n            if (elapsed.TotalHours < 24)\n            {\n                int hoursRemaining = 24 - (int)elapsed.TotalHours;\n                CPH.SendMessage($\"@{userName}, your next adventure is available in {hoursRemaining} hours!\");\n                return false;\n            }\n        }\n        \n        // Check for d20token\n        int d20tokens = CPH.GetGlobalVar<int>($\"{userId}_d20token\", true);\n        if (d20tokens < 1)\n        {\n            CPH.SendMessage($\"@{userName}, you need 1 d20token! Use: !buy d20token 1\");\n            return false;\n        }\n        \n        // Consume d20token\n        CPH.SetGlobalVar($\"{userId}_d20token\", d20tokens - 1, true);\n        \n        // Roll d20 for saving throw\n        Random rnd = new Random();\n        int roll = rnd.Next(1, 21);\n        \n        // Select random saving throw type\n        string[] saveTypes = { \"STR\", \"DEX\", \"CON\", \"INT\", \"WIS\", \"CHA\", \"DEATH\" };\n        string saveType = saveTypes[rnd.Next(saveTypes.Length)];\n        \n        // Generate scenario based on save type\n        Dictionary<string, List<string>> scenarios = new Dictionary<string, List<string>>\n        {\n            {\"STR\", new List<string> {\n                \"You encounter a massive boulder blocking your path\",\n                \"A giant egg shell must be cracked open\",\n                \"You face a mighty Chain Chomp in single combat\"\n            }},\n            {\"DEX\", new List<string> {\n                \"Traps spring from the walls of an ancient temple\",\n                \"You must dodge falling Yoshi eggs\",\n                \"A narrow bridge sways over a lava pit\"\n            }},\n            {\"CON\", new List<string> {\n                \"Toxic fumes fill the cavern\",\n                \"You must endure extreme heat in the volcano\",\n                \"A cursed egg drains your energy\"\n            }},\n            {\"INT\", new List<string> {\n                \"Ancient runes must be deciphered\",\n                \"A complex egg puzzle blocks your progress\",\n                \"You face a riddle from the Egg Guardian\"\n            }},\n            {\"WIS\", new List<string> {\n                \"Illusions cloud your judgment\",\n                \"You sense danger but must act wisely\",\n                \"A mysterious voice tempts you\"\n            }},\n            {\"CHA\", new List<string> {\n                \"You negotiate with rival egg collectors\",\n                \"A grumpy Yoshi blocks the path\",\n                \"You must convince the Egg Merchant\"\n            }},\n            {\"DEATH\", new List<string> {\n                \"You're mortally wounded and fighting for survival\",\n                \"The void beckons as your life force fades\",\n                \"Darkness closes in on all sides\"\n            }}\n        };\n        \n        string scenario = scenarios[saveType][rnd.Next(scenarios[saveType].Count)];\n        \n        // Determine outcome based on roll\n        int eggReward = 0;\n        int tokenReward = 0;\n        string outcome = \"\";\n        string tokenType = \"\";\n        \n        if (roll == 1)\n        {\n            // Critical Failure\n            eggReward = -250;\n            outcome = \"catastrophically fails\";\n            CPH.RemovePoints(userId, 250, \"Adventure Failure\");\n        }\n        else if (roll <= 5)\n        {\n            // Failure\n            eggReward = -100;\n            outcome = \"fails\";\n            CPH.RemovePoints(userId, 100, \"Adventure Failure\");\n        }\n        else if (roll <= 10)\n        {\n            // Partial Success\n            eggReward = 200;\n            outcome = \"barely succeeds\";\n            CPH.AddPoints(userId, eggReward, \"Adventure Reward\");\n        }\n        else if (roll <= 15)\n        {\n            // Success\n            eggReward = 500;\n            outcome = \"succeeds\";\n            CPH.AddPoints(userId, eggReward, \"Adventure Reward\");\n            \n            // 30% chance for token\n            if (rnd.Next(1, 101) <= 30)\n            {\n                tokenReward = 1;\n                string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\" };\n                tokenType = tokens[rnd.Next(tokens.Length)];\n                int currentTokens = CPH.GetGlobalVar<int>($\"{userId}_{tokenType}\", true);\n                CPH.SetGlobalVar($\"{userId}_{tokenType}\", currentTokens + 1, true);\n            }\n        }\n        else if (roll <= 19)\n        {\n            // Great Success\n            eggReward = 800;\n            outcome = \"succeeds brilliantly\";\n            CPH.AddPoints(userId, eggReward, \"Adventure Reward\");\n            \n            tokenReward = 1;\n            string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\" };\n            tokenType = tokens[rnd.Next(tokens.Length)];\n            int currentTokens = CPH.GetGlobalVar<int>($\"{userId}_{tokenType}\", true);\n            CPH.SetGlobalVar($\"{userId}_{tokenType}\", currentTokens + 1, true);\n        }\n        else\n        {\n            // Critical Success (Nat 20)\n            eggReward = 1500;\n            outcome = \"achieves legendary success\";\n            CPH.AddPoints(userId, eggReward, \"Adventure Reward\");\n            \n            // 2 tokens!\n            tokenReward = 2;\n            string[] tokens = { \"MysteryEgg\", \"DiceEgg\", \"DuelEgg\", \"rrtoken\" };\n            for (int i = 0; i < 2; i++)\n            {\n                tokenType = tokens[rnd.Next(tokens.Length)];\n                int currentTokens = CPH.GetGlobalVar<int>($\"{userId}_{tokenType}\", true);\n                CPH.SetGlobalVar($\"{userId}_{tokenType}\", currentTokens + 1, true);\n            }\n        }\n        \n        // Build result message\n        string message = $\"🎲 {userName}'s Adventure! {scenario}. [{saveType} Save: {roll}] You {outcome}!\";\n        \n        if (eggReward > 0)\n        {\n            message += $\" +{eggReward} 🥚\";\n        }\n        else if (eggReward < 0)\n        {\n            message += $\" {eggReward} 🥚\";\n        }\n        \n        if (tokenReward > 0)\n        {\n            message += $\" +{tokenReward} token(s)!\";\n        }\n        \n        CPH.SendMessage(message);\n        \n        // Set cooldown\n        CPH.SetGlobalVar($\"{userId}_adventureCooldown\", DateTime.Now.Ticks, true);\n        \n        // Track stats\n        int adventureCount = CPH.GetGlobalVar<int>($\"{userId}_adventureCount\", true);\n        CPH.SetGlobalVar($\"{userId}_adventureCount\", adventureCount + 1, true);\n        \n        if (roll == 20)\n        {\n            int nat20Count = CPH.GetGlobalVar<int>($\"{userId}_adventureNat20s\", true);\n            CPH.SetGlobalVar($\"{userId}_adventureNat20s\", nat20Count + 1, true);\n        }\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Check Adventure Cooldown",
+      "Description": "Check when next adventure is available",
+      "Trigger": "!adventuretime",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        long lastAdventure = CPH.GetGlobalVar<long>($\"{userId}_adventureCooldown\", true);\n        \n        if (lastAdventure == 0)\n        {\n            CPH.SendMessage($\"@{userName}, you haven't gone on an adventure yet! Use !adventure to start!\");\n            return true;\n        }\n        \n        TimeSpan elapsed = TimeSpan.FromTicks(DateTime.Now.Ticks - lastAdventure);\n        \n        if (elapsed.TotalHours >= 24)\n        {\n            CPH.SendMessage($\"@{userName}, your adventure is ready! Use !adventure to embark!\");\n        }\n        else\n        {\n            int hoursRemaining = 24 - (int)elapsed.TotalHours;\n            int minutesRemaining = 60 - elapsed.Minutes;\n            CPH.SendMessage($\"@{userName}, next adventure in {hoursRemaining}h {minutesRemaining}m\");\n        }\n        \n        return true;\n    }\n}"
+      }
+    },
+    {
+      "Name": "Adventure Stats",
+      "Description": "View adventure statistics",
+      "Trigger": "!adventurestats",
+      "Code": {
+        "Language": "C#",
+        "Source": "using System;\n\npublic class CPHInline\n{\n    public bool Execute()\n    {\n        string userId = args[\"userId\"].ToString();\n        string userName = args[\"userName\"].ToString();\n        \n        int adventureCount = CPH.GetGlobalVar<int>($\"{userId}_adventureCount\", true);\n        int nat20Count = CPH.GetGlobalVar<int>($\"{userId}_adventureNat20s\", true);\n        \n        CPH.SendMessage($\"@{userName}'s Adventures: {adventureCount} total | {nat20Count} Nat 20s! 🎲\");\n        \n        return true;\n    }\n}"
+      }
+    }
+  ],
+  "Documentation": {
+    "Commands": {
+      "StartAdventure": \"!adventure - Begin a daily D&D-style adventure (requires 1 d20token)\",
+      \"CheckCooldown\": \"!adventuretime - Check when next adventure is available\",
+      \"ViewStats\": \"!adventurestats - View your adventure statistics\"
+    },
+    \"SavingThrows\": {
+      \"STR\": \"Physical challenges, breaking barriers\",
+      \"DEX\": \"Avoiding traps, quick reflexes\",
+      \"CON\": \"Resisting poison, environmental damage\",
+      \"INT\": \"Solving puzzles, resisting enchantments\",
+      \"WIS\": \"Resisting mind control, perceiving danger\",
+      \"CHA\": \"Negotiating, charming NPCs\",
+      \"DEATH\": \"Life-or-death situations\"
+    },
+    \"Outcomes\": {
+      \"1\": \"Critical Failure - Lose 250 eggs\",
+      \"2-5\": \"Failure - Lose 100 eggs\",
+      \"6-10\": \"Partial Success - Gain 200 eggs\",
+      \"11-15\": \"Success - Gain 500 eggs + 30% chance for token\",
+      \"16-19\": \"Great Success - Gain 800 eggs + 1 token\",
+      \"20\": \"Critical Success - Gain 1,500 eggs + 2 tokens\"
+    }
+  }
 }

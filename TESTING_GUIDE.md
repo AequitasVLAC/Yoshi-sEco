@@ -2,7 +2,7 @@
 ## Yoshi's Island Eggonomy - Manual Verification Procedures
 
 **Version:** 1.0  
-**Date:** December 31, 2025  
+**Date:** December 31, 2024  
 **Target:** Streamer.bot v1.0.1
 
 ---
@@ -708,5 +708,5 @@ If all tests pass, the Yoshi's Island Eggonomy system is **fully functional** an
 ---
 
 **Document Version:** 1.0  
-**Last Updated:** December 31, 2025  
+**Last Updated:** December 31, 2024  
 **Tested With:** Streamer.bot v1.0.1

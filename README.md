@@ -4,9 +4,12 @@ Welcome to the Yoshi's Island Eggonomy repository! This repository contains comp
 
 ## 🎮 Quick Import Available!
 
+**🎉 IMPORT FIXED - December 31, 2025!** All export files now work perfectly with Streamer.bot v1.0.1!
+
 **🚀 NEW - COMPLETE SYSTEM EXPORT:** You can now import the ENTIRE Yoshi's Island Eggonomy system with one click!
 
 - **📦 [Complete System Export](EXPORT_FILES_README.md)** - Import ALL 13 actions & 12 commands instantly
+- **🔧 [Import Fixed!](IMPORT_FIX_ANNOUNCEMENT.md)** - What was fixed and how to use the corrected files
 - **📖 [Import Guide](IMPORT_GUIDE.md)** - Step-by-step installation for Streamer.bot v1.0.1
 - **🎲 [DnD Adventure Only](DnD_Adventure_Import.md)** - Just the DnD Adventure game
 

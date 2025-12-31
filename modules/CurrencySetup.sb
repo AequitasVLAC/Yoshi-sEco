@@ -1,0 +1,9 @@
+{
+  "Name": "Currency Setup",
+  "Description": "Handles the virtual currency's base implementation for the Eggonomy system.",
+  "Actions": [
+    {"Name": "InitializeCurrency", "Code": "<Currency Initialization Logic>"},
+    {"Name": "AddCurrency", "Code": "<Logic for Adding Currency>"},
+    {"Name": "CheckBalance", "Code": "<Logic for Checking Balance>"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "Name": "Games",
+  "Description": "Provides mini-games using the Eggonomy virtual currency platform.",
+  "Actions": [
+    {"Name": "PlayDiceGame", "Code": "<Dice Game Logic>"},
+    {"Name": "PlayRPS", "Code": "<Rock-Paper-Scissors Game Logic>"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "Name": "PvP Mechanics",
+  "Description": "Competitive player vs player mechanics using Eggonomy tokens and currency.",
+  "Actions": [
+    {"Name": "InitiatePvP", "Code": "<PvP Initiation Logic>"},
+    {"Name": "ResolvePvP", "Code": "<PvP Resolution Logic>"}
+  ]
+}

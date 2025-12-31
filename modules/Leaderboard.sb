@@ -1,0 +1,8 @@
+{
+  "Name": "Leaderboard",
+  "Description": "Tracks user achievements and rankings in the Eggonomy system.",
+  "Actions": [
+    {"Name": "UpdateLeaderboard", "Code": "<Leaderboard Update Logic>"},
+    {"Name": "DisplayLeaderboard", "Code": "<Display Logic for Leaderboard>"}
+  ]
+}

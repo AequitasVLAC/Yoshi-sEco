@@ -1,0 +1,8 @@
+{
+  "Name": "Shop",
+  "Description": "Enables purchasing of virtual items or rewards within Eggonomy.",
+  "Actions": [
+    {"Name": "PurchaseItem", "Code": "<Item Purchase Logic>"},
+    {"Name": "ListShopItems", "Code": "<Logic for Listing Items>"}
+  ]
+}

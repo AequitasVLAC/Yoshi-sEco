@@ -1,0 +1,8 @@
+{
+  "Name": "Adventures",
+  "Description": "Narrative-driven adventures integrated into Eggonomy.",
+  "Actions": [
+    {"Name": "StartAdventure", "Code": "<Adventure Start Logic>"},
+    {"Name": "ResolveAdventure", "Code": "<Logic for Resolving Adventure Outcomes>"}
+  ]
+}
